@@ -217,6 +217,14 @@ textarea#copyText{min-height:220px;font-family:ui-monospace,Menlo,Consolas,monos
 .toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 .toast button{background:none;border:0;color:inherit;text-decoration:underline;text-underline-offset:3px;font-weight:900;cursor:pointer;padding:4px}
 
+/* share card */
+.seg label{display:flex}
+.seg span{flex:1;display:flex;align-items:center;justify-content:center}
+.seg.three{grid-template-columns:1fr 1fr 1fr}
+.seg.three span{padding:12px 4px;font-size:14px;letter-spacing:.06em}
+.sharebtn{display:inline-flex;align-items:center;gap:8px;margin-top:12px}
+.sharebtn svg{width:18px;height:18px}
+#shPrev{display:block;width:100%;max-width:300px;aspect-ratio:4/5;margin:14px auto 0;border:2px solid var(--ink);background:var(--panel);object-fit:contain}
 /* paywall */
 #lock .btn.big{display:flex;align-items:center;justify-content:center;text-decoration:none;width:100%;margin-top:16px}
 #lock .actions .btn{flex:none}
@@ -371,6 +379,7 @@ textarea#copyText{min-height:220px;font-family:ui-monospace,Menlo,Consolas,monos
       <div class="halftone"><span id="regLB">Plus</span><span class="register" id="regB"></span><span>in benefits</span></div>
       <div class="pkg"><span>Wages and benefits</span><b id="pkg">$0.00</b></div>
       <div class="jobline" id="jobLine"></div>
+      <button class="btn small sharebtn" id="shareBtn" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v7h14v-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Share my numbers</button>
     </div>
 
     <div class="now" aria-label="Current rate">
@@ -460,6 +469,7 @@ textarea#copyText{min-height:220px;font-family:ui-monospace,Menlo,Consolas,monos
     <p class="err" id="sdErr" role="alert"></p>
     <div class="dlg-actions">
       <button type="button" class="btn danger" id="sdDelete">Delete</button>
+      <button type="button" class="btn" id="sdShare">Share</button>
       <span class="sp"></span>
       <button type="button" class="btn ghost" id="sdCancel">Cancel</button>
       <button type="submit" class="btn primary" id="sdSave">Save shift</button>
@@ -493,6 +503,26 @@ textarea#copyText{min-height:220px;font-family:ui-monospace,Menlo,Consolas,monos
   <div class="fld"><label for="rsText">Or paste backup text</label><textarea id="rsText" style="min-height:110px" spellcheck="false"></textarea></div>
   <p class="err" id="rsErr" role="alert"></p>
   <div class="dlg-actions"><span class="sp"></span><button type="button" class="btn ghost" id="rsCancel">Cancel</button><button type="button" class="btn primary" id="rsGo">Restore</button></div>
+</dialog>
+
+<dialog id="shareDlg" aria-labelledby="shTitle">
+  <h2 class="h2" id="shTitle" tabindex="-1" autofocus>Share your numbers</h2>
+  <div class="seg three" role="radiogroup" aria-label="What to share">
+    <label><input type="radio" name="shKind" value="shift"><span>Shift</span></label>
+    <label><input type="radio" name="shKind" value="today"><span>Today</span></label>
+    <label><input type="radio" name="shKind" value="job"><span>Whole job</span></label>
+  </div>
+  <label class="check"><input type="checkbox" id="shLocal"> Show my local</label>
+  <label class="check"><input type="checkbox" id="shCls"> Show my classification</label>
+  <label class="check"><input type="checkbox" id="shBen"> Show benefits</label>
+  <img id="shPrev" alt="Preview of your share picture">
+  <p class="hint">No name goes on it. Posting while you're still on the clock tells people you're away from home, so posting after the shift is safer.</p>
+  <div class="dlg-actions">
+    <button type="button" class="btn primary" id="shGo">Share picture</button>
+    <button type="button" class="btn" id="shSave">Save picture</button>
+    <span class="sp"></span>
+    <button type="button" class="btn ghost" id="shClose">Done</button>
+  </div>
 </dialog>
 
 <dialog id="askDlg" aria-labelledby="askText">
@@ -916,7 +946,7 @@ const E = {};
  'shiftList','addShift','copySheet','editJob','jobsBtn','jobsBtn2','delJob','dock','clockBtn','themeBtn',
  'shiftDlg','shiftForm','sdTitle','sdDetail','sdEditH','sdStart','sdEnd','sdSegWrap','sdSegs','sdAddSeg','sdHol','sdErr','sdDelete','sdCancel',
  'jobsDlg','jobsList','jobsOld','jobsAdd','jobsClose',
- 'askDlg','askText','askSub','askYes','askNo','bkOpen','rsOpen','restoreHint','restoreLink','bkDlg','bkSum','bkFile','bkText','bkClose','rsDlg','rsFile','rsText','rsErr','rsCancel','rsGo','copyTitle','lock','lockTitle','lockLede','buyBtn','licCheck','licInput','licGo','lockBack','licErr','saleBar','licRow','copyDlg','copyText','copyClose','toast','toastMsg','toastAct'
+ 'askDlg','askText','askSub','askYes','askNo','shareBtn','sdShare','shareDlg','shLocal','shCls','shBen','shPrev','shGo','shSave','shClose','bkOpen','rsOpen','restoreHint','restoreLink','bkDlg','bkSum','bkFile','bkText','bkClose','rsDlg','rsFile','rsText','rsErr','rsCancel','rsGo','copyTitle','lock','lockTitle','lockLede','buyBtn','licCheck','licInput','licGo','lockBack','licErr','saleBar','licRow','copyDlg','copyText','copyClose','toast','toastMsg','toastAct'
 ].forEach(id => { E[id] = document.getElementById(id); });
 
 const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1323,6 +1353,7 @@ function renderClock(){
   dedCells = deds.map((d, i) => [document.getElementById('ds' + i), document.getElementById('dj' + i), d.pct]);
 
   E.noteWrap.hidden = !run;
+  E.shareBtn.hidden = !job.shifts.length;
   if(run && document.activeElement !== E.runNote) E.runNote.value = run.note || '';
   renderShifts();
   renderSale();
@@ -1542,6 +1573,7 @@ function openShift(id, opts){
   E.sdDetail.innerHTML = editing ? detailHtml(job, editing) : '';
   E.sdEditH.textContent = editing ? 'Fix the times' : 'Times';
   E.sdDelete.hidden = !editing;
+  E.sdShare.hidden = !editing;
   const now = Date.now();
   if(editing){
     E.sdStart.value = toInput(editing.start); E.sdEnd.value = editing.end != null ? toInput(editing.end) : ''; E.sdHol.checked = !!editing.holiday;
@@ -1704,6 +1736,126 @@ E.rsGo.addEventListener('click', async () => {
   E.rsDlg.close();
   if(activeJob()) goClock(); else openSetup('new');
   toast(r.jobs || r.shifts ? 'Restored ' + r.jobs + ' job' + (r.jobs === 1 ? '' : 's') + ' and ' + r.shifts + ' shift' + (r.shifts === 1 ? '' : 's') + '.' : 'Everything in that backup is already on this phone.');
+});
+
+/* share card: a flyer-style picture for Facebook / TikTok, drawn on a canvas */
+const SITE_URL = 'jlhitchcock44-svg.github.io/Time-Hand';
+const SHARE_KEY = 'timehand.share';
+let shareState = {kind:'shift', shiftId:null, blob:null, url:null};
+function sharePrefs(){ try { return Object.assign({local:true, cls:true, ben:true}, JSON.parse(localStorage.getItem(SHARE_KEY) || '{}')); } catch(e){ return {local:true, cls:true, ben:true}; } }
+function saveSharePrefs(p){ try { localStorage.setItem(SHARE_KEY, JSON.stringify(p)); } catch(e){} }
+function shareData(kind, shiftId){
+  const now = Date.now(), job = activeJob(), S = snapshot(now, job), ctx = S.ctx;
+  let r, label, kicker, running = false;
+  if(kind === 'shift'){
+    const sh = (shiftId && job.shifts.find(x => x.id === shiftId)) || S.run || S.last;
+    if(!sh) return null;
+    r = S.per.get(sh.id); running = sh.end == null;
+    label = running ? 'So far this shift' : 'One shift';
+    kicker = dateTxt(sh.start) + '  ·  ' + timeTxt(sh.start) + ' to ' + (running ? 'now' : timeTxt(sh.end));
+  } else if(kind === 'today'){
+    r = S.today; label = 'Today'; kicker = dateTxt(now);
+  } else {
+    r = S.job; label = job.type === 'storm' ? 'Whole storm' : 'Whole job';
+    const sh = job.shifts; if(!sh.length) return null;
+    const first = Math.min.apply(null, sh.map(x => x.start)), last = Math.max.apply(null, sh.map(x => x.end == null ? now : x.end));
+    kicker = dateTxt(first) + (dayKey(first) !== dayKey(last) ? ' to ' + dateTxt(last) : '') + '  ·  ' + r.days.size + ' day' + (r.days.size === 1 ? '' : 's');
+  }
+  const hrs = r.ms / H;
+  let perHr = hrs > 0.05 ? r.wages / hrs : instant(ctx, S.run, now).wage;
+  return {wages:r.wages, ben:r.ben, hrs, perHr, label, kicker, running, storm:job.type === 'storm', cls:ctx.cls.name, local:ctx.loc.lu + ' ' + ctx.loc.name};
+}
+function tracked(g, text, x, y, sp, align){
+  let w = 0; for(const ch of text) w += g.measureText(ch).width + sp; w -= sp;
+  let cx = align === 'center' ? x - w / 2 : align === 'right' ? x - w : x;
+  for(const ch of text){ g.fillText(ch, cx, y); cx += g.measureText(ch).width + sp; }
+}
+function fitFont(g, text, tpl, size, maxW){ let s = size; while(s > 20){ g.font = tpl.replace('{s}', s); if(g.measureText(text).width <= maxW) break; s -= 4; } return s; }
+async function drawCard(d, p){
+  const W = 1080, Hh = 1350, c = document.createElement('canvas'); c.width = W; c.height = Hh;
+  const g = c.getContext('2d');
+  try { await Promise.all([document.fonts.load('100px Anton'), document.fonts.load('900 40px "Libre Franklin"'), document.fonts.load('700 40px "Libre Franklin"')]); } catch(e){}
+  const PAPER = '#F3EDE0', INK = '#151515', RED = '#B7222A', DISP = 'Anton, Impact, "Arial Narrow", sans-serif', BODY = '"Libre Franklin", "Helvetica Neue", Arial, sans-serif';
+  const L = 64, R = W - 64, CW = R - L;
+  g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+  g.fillStyle = PAPER; g.fillRect(0, 0, W, Hh);
+  // masthead
+  g.fillStyle = INK; g.fillRect(0, 0, W, 150); g.fillStyle = RED; g.fillRect(0, 150, W, 14);
+  g.fillStyle = PAPER; g.font = '96px ' + DISP; g.fillText('TIME HAND', L, 114);
+  g.font = '900 28px ' + BODY; tracked(g, 'STAY CUT IN', R, 104, 6, 'right');
+  let y = 250;
+  g.fillStyle = INK; g.font = '800 34px ' + BODY; tracked(g, d.kicker.toUpperCase(), L, y, 3, 'left');
+  y += 118; g.fillStyle = RED; fitFont(g, d.label.toUpperCase(), '{s}px ' + DISP, 124, CW); g.fillText(d.label.toUpperCase(), L, y);
+  // the big number
+  const big = money(d.wages); y += 12;
+  const bs = fitFont(g, big, '{s}px ' + DISP, 250, CW); y += bs * 0.98; g.fillStyle = INK; g.fillText(big, L - 4, y);
+  y += 22;
+  if(p.ben){
+    const txt = 'PLUS ' + money(d.ben) + ' IN BENEFITS';
+    g.font = '900 46px ' + BODY; let tw = 0; for(const ch of txt) tw += g.measureText(ch).width + 3;
+    const bw = Math.min(CW, tw + 48), bh = 86;
+    g.fillStyle = RED; g.fillRect(L, y, bw, bh);
+    g.fillStyle = 'rgba(0,0,0,0.26)';
+    for(let yy = y + 5; yy < y + bh; yy += 9) for(let xx = L + 5 + ((yy / 9) % 2 ? 4 : 0); xx < L + bw; xx += 9){ g.beginPath(); g.arc(xx, yy, 1.8, 0, 6.2832); g.fill(); }
+    g.fillStyle = PAPER; g.font = '900 46px ' + BODY; tracked(g, txt, L + 24, y + 60, 3, 'left');
+    y += bh;
+  }
+  // rule band
+  y += 44; g.fillStyle = INK; g.fillRect(L, y, CW, 8);
+  const bits = [d.hrs.toFixed(2) + ' HOURS']; if(d.storm) bits.push('STORM'); if(p.cls) bits.push(d.cls.toUpperCase()); if(p.local) bits.push(d.local.toUpperCase());
+  const line = bits.join('  ·  ');
+  g.font = '900 30px ' + BODY; let lw = 0; for(const ch of line) lw += g.measureText(ch).width + 3;
+  if(lw > CW){ const s2 = Math.max(18, Math.floor(30 * CW / lw)); g.font = '900 ' + s2 + 'px ' + BODY; }
+  tracked(g, line, W / 2, y + 58, 3, 'center');
+  y += 82; g.fillRect(L, y, CW, 8);
+  // rate boxes
+  y += 40; const bw2 = (CW - 28) / 2, bh2 = 170;
+  [[money(d.perHr), 'AN HOUR, AVERAGE'], [money(d.perHr / 60), 'A MINUTE']].forEach((b, i) => {
+    const x = L + i * (bw2 + 28);
+    g.lineWidth = 8; g.strokeStyle = INK; g.strokeRect(x + 4, y + 4, bw2 - 8, bh2 - 8);
+    g.fillStyle = INK; fitFont(g, b[0], '{s}px ' + DISP, 100, bw2 - 56); g.fillText(b[0], x + 28, y + 108);
+    g.font = '900 26px ' + BODY; tracked(g, b[1], x + 28, y + 148, 3, 'left');
+  });
+  // footer
+  g.fillStyle = INK; g.fillRect(0, Hh - 160, W, 160);
+  g.fillStyle = PAPER; g.font = '64px ' + DISP; g.fillText('TRACK YOUR OWN CHECK', L, Hh - 82);
+  g.fillStyle = '#E0544A'; g.font = '800 30px ' + BODY; g.fillText(SITE_URL, L, Hh - 36);
+  return await new Promise(res => c.toBlob(res, 'image/png'));
+}
+async function renderShare(){
+  const p = {local:E.shLocal.checked, cls:E.shCls.checked, ben:E.shBen.checked}; saveSharePrefs(p);
+  const k = qs('input[name="shKind"]:checked'); shareState.kind = k ? k.value : 'shift';
+  const d = shareData(shareState.kind, shareState.kind === 'shift' ? shareState.shiftId : null);
+  if(!d){ E.shPrev.removeAttribute('src'); return; }
+  const blob = await drawCard(d, p);
+  if(shareState.url) URL.revokeObjectURL(shareState.url);
+  shareState.blob = blob; shareState.url = URL.createObjectURL(blob); E.shPrev.src = shareState.url;
+}
+function openShare(kind, shiftId){
+  shareState.shiftId = shiftId || null;
+  qsa('input[name="shKind"]').forEach(r => { r.checked = r.value === kind; });
+  const p = sharePrefs(); E.shLocal.checked = p.local; E.shCls.checked = p.cls; E.shBen.checked = p.ben;
+  E.shareDlg.showModal(); renderShare();
+}
+function savePicture(){
+  if(!shareState.url) return;
+  const a = document.createElement('a'); a.href = shareState.url; a.download = 'time-hand-' + ymd(Date.now()) + '.png';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('If nothing saved, press and hold the picture and choose Save.');
+}
+E.shareBtn.addEventListener('click', () => openShare('shift', null));
+E.sdShare.addEventListener('click', () => { const id = editing && editing.id; E.shiftDlg.close(); openShare('shift', id); });
+E.shareDlg.addEventListener('change', renderShare);
+E.shClose.addEventListener('click', () => E.shareDlg.close());
+E.shSave.addEventListener('click', savePicture);
+E.shGo.addEventListener('click', async () => {
+  if(!shareState.blob) return;
+  const f = new File([shareState.blob], 'time-hand.png', {type:'image/png'});
+  if(navigator.canShare && navigator.canShare({files:[f]})){
+    try { await navigator.share({files:[f], text:'Tracked with Time Hand: https://' + SITE_URL + '/'}); return; }
+    catch(e){ if(e && e.name === 'AbortError') return; }
+  }
+  savePicture();
 });
 
 /* timesheet */
