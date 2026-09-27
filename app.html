@@ -944,9 +944,10 @@ function switchJob(id){ state.activeId = id; persist(); goClock(); }
    Fill in checkoutUrl, storeId and productId to turn the paywall on.
    While any of them is empty the app stays free and never calls out. */
 const SALE = {
-  checkoutUrl: '',            /* Lemon Squeezy checkout link for the yearly Time Hand product */
-  storeId: 0,                 /* meta.store_id from a test key */
-  productIds: [],             /* meta.product_id values: test-mode product and live-mode copy */
+  checkoutUrl: 'https://staycutin.lemonsqueezy.com/checkout/buy/f70dbbb8-af4c-4e4c-bedc-a0c28b295914',
+  storeId: 484633,            /* Stay Cut In Electric */
+  productIds: [1392230],      /* Time Hand (test mode). Add the live-mode copy's ID after approval */
+  allowTestKeys: true,        /* test-mode keys unlock the app. Set false when the store goes live */
   price: '$19.99',
   trialDays: 7,
   recheckDays: 3,             /* re-validate the key this often when there's signal */
@@ -997,6 +998,10 @@ async function activateKey(key){
     return j.error || "That key didn't work.";
   }
   const m = j.meta || {};
+  if(j.license_key && j.license_key.test_mode && !SALE.allowTestKeys){
+    try { await licPost('deactivate', {license_key:key, instance_id:j.instance.id}); } catch(e){}
+    return "That's a test key. Use the key from your real purchase.";
+  }
   if(Number(m.store_id) !== Number(SALE.storeId) || !SALE.productIds.map(Number).includes(Number(m.product_id))){
     try { await licPost('deactivate', {license_key:key, instance_id:j.instance.id}); } catch(e){}
     return "That key is for a different product.";
@@ -1016,7 +1021,8 @@ async function recheck(force){
   checking = false;
   if(!j) return;                                   /* no signal: try again next time */
   lic.lastCheck = Date.now();
-  if(j.valid && j.license_key && j.license_key.status === 'active'){ lic.status = 'active'; lic.expiresAt = j.license_key.expires_at || null; lic.lastOk = Date.now(); }
+  if(j.license_key && j.license_key.test_mode && !SALE.allowTestKeys) lic.status = 'invalid';
+  else if(j.valid && j.license_key && j.license_key.status === 'active'){ lic.status = 'active'; lic.expiresAt = j.license_key.expires_at || null; lic.lastOk = Date.now(); }
   else if(j.license_key && j.license_key.status) lic.status = j.license_key.status;
   else if(j.error) lic.status = 'invalid';
   saveLic(lic); applyAccess();
@@ -1614,6 +1620,19 @@ if(saleOn()){
   recheck(a0.mode === 'recheck' || !!a0.stale);
   setInterval(() => { applyAccess(); recheck(false); }, 60000);
 }
+/* key handed over by the "Open Time Hand" button after checkout: app.html?key=... */
+(function(){
+  try {
+    const u = new URL(location.href), k = u.searchParams.get('key');
+    if(!k) return;
+    u.searchParams.delete('key');
+    history.replaceState(null, '', u.pathname + u.search + u.hash);
+    if(!saleOn() || k.indexOf('[') >= 0) return;
+    const lic = readLic(); if(lic && lic.status === 'active') return;
+    showLock(access(Date.now()), true);
+    E.licInput.value = k; E.licGo.click();
+  } catch(e){}
+})();
 
 let lastFrame = 0;
 function loop(ts){
