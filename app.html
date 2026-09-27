@@ -3,22 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0A1320">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#151515">
 <meta name="apple-mobile-web-app-title" content="Time Hand">
 <meta name="description" content="Time Hand: a running pay meter for linemen. Clock in and watch wages and benefits add up by the second, priced by your local's agreement.">
 <title>Time Hand · Stay Cut In</title>
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&family=Oswald:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap">
 <style>
 :root{
-  --bg:#E3E7EA; --face:#F8F9F7; --panel:#FFFFFF; --ink:#0F1B2D; --ink2:#394657; --ink3:#5F6C7D; --line:#C8CFD6;
-  --bezel:#B7C0C9; --copper:#A4521A; --ground:#1C7547; --warn:#8A6700; --alert:#B3261E;
-  --disc:#AEB8C2; --mark:#1A2330; --btn-ink:#FFFFFF;
-  --display:'Oswald','Arial Narrow',Impact,sans-serif;
-  --body:'Barlow',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
-  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --paper:#F3EDE0; --panel:#FBF8F1; --ink:#151515; --ink2:#3B3733; --ink3:#5E5850; --hair:rgba(21,21,21,.22);
+  --red:#B7222A; --on-red:#FBF6EC; --band:#151515; --band-fg:#F3EDE0; --dot:rgba(21,21,21,.30);
+  --display:'Anton','Oswald',Impact,'Arial Narrow',sans-serif;
+  --body:'Libre Franklin','Franklin Gothic Medium','Helvetica Neue',sans-serif;
   color-scheme:light;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
@@ -26,209 +25,212 @@
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#0A1320; --face:#0E1929; --panel:#111E31; --ink:#EDF1F5; --ink2:#B5C0CD; --ink3:#8391A3; --line:#233550;
-    --bezel:#28394F; --copper:#EE9447; --ground:#4FC48D; --warn:#E9BE3A; --alert:#FF6E61;
-    --disc:#56647A; --mark:#E9EEF3; --btn-ink:#0A1320; color-scheme:dark;
+    --paper:#161513; --panel:#1F1D1A; --ink:#EFE7D6; --ink2:#D2C9B7; --ink3:#A89F8D; --hair:rgba(239,231,214,.22);
+    --red:#E0544A; --on-red:#161513; --band:#000000; --band-fg:#EFE7D6; --dot:rgba(0,0,0,.35); color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0A1320; --face:#0E1929; --panel:#111E31; --ink:#EDF1F5; --ink2:#B5C0CD; --ink3:#8391A3; --line:#233550;
-  --bezel:#28394F; --copper:#EE9447; --ground:#4FC48D; --warn:#E9BE3A; --alert:#FF6E61;
-  --disc:#56647A; --mark:#E9EEF3; --btn-ink:#0A1320; color-scheme:dark;
+  --paper:#161513; --panel:#1F1D1A; --ink:#EFE7D6; --ink2:#D2C9B7; --ink3:#A89F8D; --hair:rgba(239,231,214,.22);
+  --red:#E0544A; --on-red:#161513; --band:#000000; --band-fg:#EFE7D6; --dot:rgba(0,0,0,.35); color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
-button,input,select{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--copper);outline-offset:2px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
 .wrap{max-width:480px;margin:0 auto;padding:0 16px}
 
-/* header */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg)}
-.top::after{content:"";display:block;height:4px;background:repeating-linear-gradient(-45deg,var(--warn) 0 8px,transparent 8px 16px);opacity:.8}
+/* header band */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--band);color:var(--band-fg);border-bottom:4px solid var(--red)}
 .top-in{max-width:480px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
-.brand{display:flex;align-items:baseline;gap:8px;flex:1;min-width:0}
-.brand svg{width:20px;height:20px;align-self:center;color:var(--copper);flex:none}
-.brand b{font-family:var(--display);font-weight:600;font-size:23px;letter-spacing:.01em}
-.brand span{font-size:13px;color:var(--ink3)}
-.icon-btn{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--panel);display:grid;place-items:center;cursor:pointer}
+.brand{display:flex;align-items:baseline;gap:10px;flex:1;min-width:0}
+.brand b{font-family:var(--display);font-weight:400;font-size:27px;letter-spacing:.04em;line-height:1}
+.brand span{font-size:11px;font-weight:800;letter-spacing:.18em;white-space:nowrap}
+.top-btns{display:flex;gap:8px}
+.icon-btn{width:44px;height:44px;border:2px solid var(--band-fg);background:transparent;color:var(--band-fg);display:grid;place-items:center;cursor:pointer;border-radius:0}
 .icon-btn svg{width:20px;height:20px}
 
 /* type */
-.h1{font-family:var(--display);font-weight:600;font-size:30px;line-height:1.1;margin:22px 0 6px}
-.lede{margin:0 0 8px;color:var(--ink2)}
-.h2{font-family:var(--display);font-weight:600;font-size:20px;line-height:1.2;margin:0 0 10px}
+.h1{font-family:var(--display);font-weight:400;font-size:46px;line-height:.95;margin:24px 0 8px;text-transform:uppercase}
+.h2{font-family:var(--display);font-weight:400;font-size:23px;line-height:1.05;margin:0 0 10px;text-transform:uppercase;letter-spacing:.01em}
+.lede{margin:0 0 10px;color:var(--ink2);font-size:17px}
 .hint{font-size:14px;color:var(--ink3);margin:6px 0 0}
 .info{font-size:14px;color:var(--ink2);margin-top:10px;line-height:1.5}
 .info p{margin:0 0 4px}
-.err{color:var(--alert);font-weight:600;min-height:1em}
+.err{color:var(--red);font-weight:800;min-height:1em}
 
 /* form */
-input,select{width:100%;min-height:46px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
-input[type=checkbox],input[type=radio]{width:20px;height:20px;min-height:0;padding:0;accent-color:var(--copper);flex:none}
+input,select,textarea{width:100%;min-height:46px;padding:10px 12px;border:2px solid var(--ink);border-radius:0;background:var(--panel)}
+textarea{min-height:84px;resize:vertical;line-height:1.4}
+input[type=checkbox],input[type=radio]{width:20px;height:20px;min-height:0;padding:0;accent-color:var(--red);flex:none}
 .fld{margin-top:12px}
-.fld>label{display:block;font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:5px}
+.fld>label{display:block;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 10px}
 .span2{grid-column:1/-1}
 .pair{display:grid;grid-template-columns:1.4fr 1fr;gap:8px}
-.check{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:14px;font-size:15px}
+.check{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:14px;font-size:15px;font-weight:600}
 .mini{width:72px;min-height:40px;padding:6px 8px;display:inline-block}
-.rules{border:1px solid var(--line);border-radius:12px;padding:6px 12px 14px;margin:16px 0 0}
-.rules legend{font-family:var(--display);font-weight:500;font-size:17px;padding:0 6px}
-.linkbtn{background:none;border:0;padding:8px 0 0;color:var(--copper);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.rules{border:3px solid var(--ink);border-radius:0;padding:6px 12px 14px;margin:16px 0 0}
+.rules legend{font-family:var(--display);font-weight:400;font-size:18px;text-transform:uppercase;padding:0 6px}
+.linkbtn{background:none;border:0;padding:8px 0 0;color:var(--red);font-weight:800;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 ol.steps{list-style:none;counter-reset:step;padding:0;margin:14px 0 0}
-.step{counter-increment:step;position:relative;padding:18px 0 20px 44px;border-top:1px solid var(--line)}
-.step::before{content:counter(step);position:absolute;left:0;top:16px;width:30px;height:30px;border-radius:50%;border:2px solid var(--copper);color:var(--copper);font-family:var(--display);font-weight:600;display:grid;place-items:center}
-.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px}
+.step{counter-increment:step;position:relative;padding:18px 0 22px 48px;border-top:4px solid var(--ink)}
+.step::before{content:counter(step);position:absolute;left:0;top:16px;width:34px;height:34px;border:3px solid var(--ink);font-family:var(--display);font-size:20px;display:grid;place-items:center}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:3px solid var(--ink)}
 .seg label{position:relative;cursor:pointer}
+.seg label+label{border-left:3px solid var(--ink)}
 .seg input{position:absolute;opacity:0;pointer-events:none}
-.seg span{display:block;text-align:center;padding:11px 8px;border-radius:9px;font-weight:600}
-.seg input:checked+span{background:var(--ink);color:var(--bg)}
-.seg input:focus-visible+span{outline:3px solid var(--copper);outline-offset:2px}
-.cls{display:grid;grid-template-columns:auto 1fr auto;gap:0 10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-top:6px;background:var(--panel);cursor:pointer}
-.cls:has(input:checked){border-color:var(--copper);box-shadow:inset 0 0 0 1px var(--copper)}
-.cls-n{font-weight:600;line-height:1.25}
+.seg span{display:block;text-align:center;padding:12px 8px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.seg input:checked+span{background:var(--ink);color:var(--paper)}
+.seg input:focus-visible+span{outline:3px solid var(--red);outline-offset:-5px}
+.cls{display:grid;grid-template-columns:auto 1fr auto;gap:0 10px;align-items:center;padding:10px 12px;border:2px solid var(--ink);margin-top:6px;background:var(--panel);cursor:pointer}
+.cls:has(input:checked){border-color:var(--red);box-shadow:inset 0 0 0 2px var(--red)}
+.cls-n{font-weight:700;line-height:1.25}
 .cls-n small{display:block;font-weight:500;font-size:13px;color:var(--ink3)}
-.cls-r{font-family:var(--mono);font-weight:700;font-size:15px}
+.cls-r{font-family:var(--display);font-size:18px}
 .actions{display:flex;gap:10px;margin:8px 0 10px}
-.btn{min-height:46px;padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-weight:600;cursor:pointer}
-.btn.primary{background:var(--copper);border-color:var(--copper);color:var(--btn-ink)}
-.btn.big{flex:1;min-height:54px;font-family:var(--display);font-size:20px;font-weight:500}
-.btn.ghost{background:transparent}
-.btn.danger{background:transparent;color:var(--alert);border-color:var(--alert)}
-.btn-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btn{min-height:46px;padding:10px 16px;border:3px solid var(--ink);border-radius:0;background:transparent;color:var(--ink);font-weight:800;letter-spacing:.03em;cursor:pointer}
+.btn.primary{background:var(--red);color:var(--on-red);box-shadow:4px 4px 0 var(--ink)}
+.btn.big{flex:1;min-height:56px;font-family:var(--display);font-weight:400;font-size:24px;letter-spacing:.05em;text-transform:uppercase}
+.btn.ghost{border-color:transparent;text-decoration:underline;text-underline-offset:3px}
+.btn.danger{color:var(--red);border-color:var(--red)}
+.btn.small{min-height:44px;padding:8px 12px;font-size:14px;flex:none}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
 
 /* job strip */
-.jobstrip{display:grid;grid-template-columns:1fr auto;gap:0 12px;align-items:center;width:100%;margin-top:14px;padding:10px 14px;text-align:left;border:1px solid var(--line);border-radius:12px;background:var(--panel);cursor:pointer}
-.js-name{font-size:13px;color:var(--ink3)}
-.js-top{font-family:var(--display);font-weight:600;font-size:19px;line-height:1.2}
+.jobstrip{display:flex;align-items:center;gap:12px;margin-top:14px;padding:10px 12px;border:3px solid var(--ink)}
+.js-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.js-name{font-size:12px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+.js-top{font-family:var(--display);font-size:22px;line-height:1.1;text-transform:uppercase}
 .js-sub{font-size:14px;color:var(--ink2)}
-.js-edit{grid-row:1/span 3;grid-column:2;color:var(--copper);font-weight:700}
-.flag{display:flex;gap:8px;align-items:flex-start;padding:9px 12px;border-radius:10px;font-size:14px;margin-top:8px;border-left:4px solid var(--warn);background:color-mix(in srgb,var(--warn) 11%,transparent)}
-.flag.info{border-color:var(--ink3);background:color-mix(in srgb,var(--ink3) 9%,transparent)}
-.flag.alert{border-color:var(--alert);background:color-mix(in srgb,var(--alert) 12%,transparent);font-weight:600}
+.flag{padding:10px 12px;font-size:14px;margin-top:10px;border:2px solid var(--ink);font-weight:600}
+.flag.info{border-style:dashed;font-weight:500}
+.flag.alert{border-color:var(--red);color:var(--red);font-weight:800}
 
-/* the meter */
-.meter{position:relative;margin-top:14px;padding:16px 18px 16px;border-radius:28px;background:var(--face);border:7px solid var(--bezel);box-shadow:0 1px 0 var(--line),inset 0 2px 10px rgba(0,0,0,.08)}
-.meter::before{content:"";position:absolute;inset:0;border-radius:21px;background:linear-gradient(155deg,rgba(255,255,255,.22),transparent 38%);pointer-events:none}
-.plate{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2)}
-.plate .st{flex:1;min-width:0}
-.dot{width:10px;height:10px;border-radius:50%;background:var(--ink3);flex:none}
-.dot.on{background:var(--copper);box-shadow:0 0 0 0 var(--copper);animation:pulse 1.6s ease-out infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--copper) 60%,transparent)}100%{box-shadow:0 0 0 10px transparent}}
-.elapsed{font-family:var(--mono);font-weight:600;font-size:15px;font-variant-numeric:tabular-nums}
-.reg-l{font-size:14px;color:var(--ink3);margin-top:12px}
-.register{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.03em;line-height:1.05;white-space:nowrap}
-.register .tail{font-size:.42em;opacity:.55;letter-spacing:0;margin-left:1px}
-.register.w{font-size:clamp(36px,11.5vw,50px);color:var(--copper)}
-.register.b{font-size:clamp(28px,8.5vw,36px);color:var(--ground)}
-.disc{height:12px;border-radius:6px;margin:12px 0 2px;background-color:var(--disc);background-image:linear-gradient(90deg,transparent 0 44px,var(--mark) 44px 50px,transparent 50px 120px),linear-gradient(180deg,rgba(255,255,255,.35),rgba(0,0,0,.18));background-size:120px 100%,100% 100%;background-repeat:repeat-x,no-repeat;box-shadow:inset 0 1px 3px rgba(0,0,0,.35)}
-.pkg{display:flex;justify-content:space-between;gap:10px;margin-top:14px;padding-top:10px;border-top:1px dashed var(--line);font-size:15px}
-.pkg b{font-family:var(--mono);font-variant-numeric:tabular-nums}
+/* the flyer */
+.flyer{margin-top:18px}
+.fl-head{font-family:var(--display);font-size:clamp(64px,21vw,92px);line-height:.9;text-transform:uppercase;display:flex;flex-direction:column}
+.fl-head .red{color:var(--red)}
+.fl-since{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-weight:700;font-size:15px;margin-top:8px}
+.elapsed{font-family:var(--display);font-weight:400;font-size:24px;letter-spacing:.03em;white-space:nowrap}
+.fixbtn{display:inline-flex;align-items:center;gap:8px;margin-top:10px;min-height:44px;padding:8px 12px;border:2px dashed var(--ink);background:transparent;color:var(--ink);font-weight:800;font-size:14px;cursor:pointer;text-align:left}
+.fixbtn svg{width:18px;height:18px;flex:none}
+.fl-band{margin:14px 0 12px;border-top:4px solid var(--ink);border-bottom:4px solid var(--ink);padding:7px 0;text-align:center;font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.reg-l{font-size:13px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}
+.register{font-family:var(--display);font-weight:400;line-height:1;white-space:nowrap}
+.register .dg{display:inline-block;width:.52em;text-align:center}
+.register .tail{font-size:.4em;opacity:.55;margin-left:.08em}
+.register.w{font-size:clamp(58px,19vw,80px)}
+.halftone{display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin-top:8px;padding:6px 10px;background-color:var(--red);background-image:radial-gradient(var(--dot) 1.1px,transparent 1.3px);background-size:6px 6px;color:var(--on-red);font-weight:900;font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+.halftone .register{font-size:30px;letter-spacing:0}
+.pkg{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:14px;padding-top:10px;border-top:1px solid var(--ink);font-weight:700}
+.pkg b{font-family:var(--display);font-weight:400;font-size:21px;letter-spacing:.02em}
 .jobline{font-size:14px;color:var(--ink2);margin-top:4px}
-.jobline b{font-family:var(--mono);font-weight:600}
+.jobline b{font-weight:900;color:var(--ink)}
 
 /* right now */
-.now{display:grid;grid-template-columns:1fr 1.15fr 1fr;margin-top:12px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
-.now>div{padding:10px 10px 12px;min-width:0}
-.now>div+div{border-left:1px solid var(--line)}
-.now .l{font-size:13px;color:var(--ink3)}
-.now .v{font-family:var(--mono);font-weight:700;color:var(--copper);font-size:16px;font-variant-numeric:tabular-nums}
-.now .hi .v{font-size:22px}
-.now .bb{font-family:var(--mono);font-size:13px;color:var(--ground);font-variant-numeric:tabular-nums}
-.now-note{font-size:14px;color:var(--ink2);margin:8px 2px 0}
-.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
-.mode{min-height:54px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink2);font-weight:600;cursor:pointer}
-.mode small{display:block;font-family:var(--mono);font-size:12px;font-weight:600;opacity:.85}
-.mode[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.next{font-size:14px;margin:10px 2px 0;color:var(--ink2)}
-.next b{color:var(--copper)}
+.now{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:18px}
+.now>div{border:3px solid var(--ink);padding:8px 8px 10px;min-width:0}
+.now .l{font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.now .v{font-family:var(--display);font-size:22px;line-height:1.15;white-space:nowrap}
+.now .bb{font-size:13px;font-weight:800;color:var(--red);white-space:nowrap}
+.now .hi{background:var(--ink);color:var(--paper)}
+.now .hi .v{font-size:26px}
+.now .hi .bb{color:var(--paper);opacity:.85}
+.now-note{font-size:14px;color:var(--ink2);margin:10px 0 0}
+.modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.mode{min-height:56px;border:3px solid var(--ink);border-radius:0;background:transparent;color:var(--ink);font-weight:900;font-size:14px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.mode small{display:block;font-family:var(--display);font-weight:400;font-size:17px;letter-spacing:.02em}
+.mode[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.next{font-size:14px;margin:10px 0 0;color:var(--ink2);font-weight:600}
+.next b{color:var(--red)}
+.note-wrap{margin-top:16px}
 
 /* sections */
-.sec{margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}
+.sec{margin-top:28px;padding-top:14px;border-top:4px solid var(--ink)}
 .tbl{width:100%;border-collapse:collapse;font-size:15px}
-.tbl th,.tbl td{padding:8px 0;border-bottom:1px solid var(--line);vertical-align:top}
-.tbl thead th{font-size:13px;font-weight:600;color:var(--ink3);text-align:right}
+.tbl th,.tbl td{padding:8px 0;border-bottom:1px solid var(--hair);vertical-align:top}
+.tbl thead th{font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;text-align:right;border-bottom:2px solid var(--ink)}
 .tbl thead th:first-child{text-align:left}
-.tbl tbody th{text-align:left;font-weight:600}
+.tbl tbody th{text-align:left;font-weight:700}
 .tbl tbody th small{display:block;font-weight:500;font-size:13px;color:var(--ink3)}
-.tbl td{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;padding-left:8px;white-space:nowrap}
-.tbl tr.sum th,.tbl tr.sum td{border-bottom:0;color:var(--ground);font-weight:700}
+.tbl td{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;padding-left:8px;white-space:nowrap}
+.tbl tr.sum th,.tbl tr.sum td{border-bottom:0;color:var(--red);font-weight:900}
 .tbl.ded td{color:var(--ink2)}
 .tot{display:grid;gap:8px}
-.tot-row{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
-.tot-l{font-weight:700}
+.tot-row{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 14px;border:3px solid var(--ink)}
+.tot-l{font-weight:900;text-transform:uppercase;letter-spacing:.04em}
 .tot-s{font-size:13px;color:var(--ink3)}
-.tot-v{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
-.tot-v span{display:block;font-weight:700;color:var(--copper);font-size:18px}
-.tot-v small{display:block;color:var(--ground);font-size:13px}
-.shifts{list-style:none;margin:0;padding:0}
-.shift-b{width:100%;display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 2px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;cursor:pointer}
-.sh-d{font-weight:700}
-.sh-d em{font-style:normal;color:var(--copper);font-weight:600;margin-left:6px}
+.tot-v{text-align:right}
+.tot-v span{display:block;font-family:var(--display);font-size:24px;line-height:1.1}
+.tot-v small{display:block;color:var(--red);font-size:13px;font-weight:800}
+.shifts{list-style:none;margin:0;padding:0;border-top:2px solid var(--ink)}
+.shift-b{width:100%;display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 0;border:0;border-bottom:2px solid var(--ink);background:none;text-align:left;cursor:pointer}
+.sh-d{font-weight:900;text-transform:uppercase;letter-spacing:.03em}
+.sh-d em{font-style:normal;font-weight:800;color:var(--red);margin-left:8px;font-size:12px;letter-spacing:.1em}
 .sh-t,.sh-h{font-size:14px;color:var(--ink2)}
-.sh-w{text-align:right;font-family:var(--mono);font-weight:700;color:var(--copper)}
-.sh-b{text-align:right;font-family:var(--mono);font-size:13px;color:var(--ground)}
-.empty{color:var(--ink3);font-size:15px;padding:8px 0}
-.past{font-size:14px;color:var(--ink2);padding:8px 0;border-bottom:1px solid var(--line)}
+.sh-w{text-align:right;font-family:var(--display);font-size:21px;line-height:1.1}
+.sh-b{text-align:right;font-size:13px;font-weight:800;color:var(--red)}
+.sh-note{grid-column:1/-1;font-size:14px;color:var(--ink2);margin-top:4px}
+.sh-note b{color:var(--ink);font-weight:900;text-transform:uppercase;font-size:12px;letter-spacing:.1em;margin-right:6px}
+.sh-edit{grid-column:1/-1;justify-self:start;margin-top:6px;border:2px solid var(--ink);padding:4px 12px;font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.empty{color:var(--ink3);font-size:15px;padding:10px 0}
+.past{font-size:14px;color:var(--ink2);padding:8px 0;border-bottom:1px solid var(--hair)}
 .past b{color:var(--ink)}
-.foot{margin:28px 0 10px;font-size:13px;color:var(--ink3);line-height:1.5}
+.foot{margin:30px 0 10px;font-size:13px;color:var(--ink3);line-height:1.5}
+.foot a{color:var(--red)}
 
 /* dock */
-.dock{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:14px 16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--bg) 72%,transparent)}
-.clock-btn{display:block;width:100%;max-width:448px;margin:0 auto;height:62px;border-radius:14px;border:0;background:var(--copper);color:var(--btn-ink);font-family:var(--display);font-size:24px;font-weight:500;letter-spacing:.02em;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.18)}
-.clock-btn.out{background:var(--panel);color:var(--ink);border:2px solid var(--ink)}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:var(--paper);border-top:3px solid var(--ink)}
+.clock-btn{display:block;width:100%;max-width:440px;margin:0 auto;height:62px;border:3px solid var(--ink);border-radius:0;background:var(--ink);color:var(--paper);font-family:var(--display);font-size:30px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;box-shadow:5px 5px 0 var(--red)}
+.clock-btn.out{background:var(--red);color:var(--on-red);box-shadow:5px 5px 0 var(--ink)}
 
 /* dialogs */
-dialog{border:1px solid var(--line);border-radius:16px;background:var(--face);color:var(--ink);padding:18px;width:min(440px,calc(100vw - 24px));max-height:calc(100dvh - 40px)}
-dialog::backdrop{background:rgba(5,10,18,.6)}
+dialog{border:3px solid var(--ink);border-radius:0;background:var(--paper);color:var(--ink);padding:18px;width:min(440px,calc(100vw - 24px));max-height:calc(100dvh - 40px);box-shadow:8px 8px 0 rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(10,9,8,.6)}
 dialog h2{margin-top:0}
-.dlg-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+dialog h2:focus{outline:none}
+dialog h3{font-family:var(--display);font-weight:400;font-size:18px;text-transform:uppercase;margin:18px 0 4px}
+.dlg-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
 .dlg-actions .sp{flex:1}
-textarea{width:100%;min-height:220px;font-family:var(--mono);font-size:12px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
-.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;background:var(--ink);color:var(--bg);padding:11px 14px;border-radius:12px;display:flex;gap:14px;align-items:center;z-index:60;max-width:calc(100vw - 32px);font-weight:600}
-.toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-.toast button{background:none;border:0;color:inherit;text-decoration:underline;text-underline-offset:3px;font-weight:700;cursor:pointer;padding:4px}
-@media (prefers-reduced-motion:reduce){.dot.on{animation:none}.toast{transition:none}}
-@media (max-width:360px){.now .hi .v{font-size:19px}.now .v{font-size:14px}.grid3{grid-template-columns:1fr 1fr}}
-
-/* v2: jobs, split shifts, shift breakdown */
-.top-btns{display:flex;gap:8px}
-.seg-row{display:grid;grid-template-columns:1fr 1.25fr 42px;gap:8px;align-items:center;margin-top:8px}
-.seg-from{font-weight:600;color:var(--ink2);font-size:15px}
-.seg-x{width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:22px;line-height:1;cursor:pointer;color:var(--ink2)}
-.detail{margin:0 0 6px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+textarea#copyText{min-height:220px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+.detail{margin:0 0 6px;padding:10px 12px;border:2px solid var(--ink);background:var(--panel)}
 .detail .tbl{font-size:14px}
 .detail .tbl th,.detail .tbl td{padding:6px 0}
-.detail .tbl tr.wg th,.detail .tbl tr.wg td{color:var(--copper);font-weight:700}
-.detail .tbl tr.bn th,.detail .tbl tr.bn td{color:var(--ground);font-weight:700}
-.detail .tbl tr.gap th{padding-top:12px;font-size:13px;color:var(--ink3);font-weight:600}
+.detail .tbl tr.wg th,.detail .tbl tr.wg td{font-weight:900}
+.detail .tbl tr.bn th,.detail .tbl tr.bn td{color:var(--red);font-weight:900}
+.detail .tbl tr.gap th{padding-top:12px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:900}
 .detail .note{font-size:13px;color:var(--ink3);margin:8px 0 0}
-.jobs{list-style:none;margin:0;padding:0}
-.job-b{width:100%;display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 2px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;cursor:pointer}
-.jb-n{font-weight:700}
-.jb-n em{font-style:normal;font-weight:600;color:var(--copper);margin-left:6px;font-size:14px}
+.seg-row{display:grid;grid-template-columns:1fr 1.25fr 44px;gap:8px;align-items:center;margin-top:8px}
+.seg-from{font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:.06em}
+.seg-x{width:44px;height:44px;border:2px solid var(--ink);border-radius:0;background:transparent;font-size:22px;line-height:1;cursor:pointer}
+.jobs{list-style:none;margin:0;padding:0;border-top:2px solid var(--ink)}
+.job-b{width:100%;display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 0;border:0;border-bottom:2px solid var(--ink);background:none;text-align:left;cursor:pointer}
+.jb-n{font-weight:900;text-transform:uppercase}
+.jb-n em{font-style:normal;font-weight:800;color:var(--red);margin-left:6px;font-size:12px;letter-spacing:.1em}
 .jb-s{font-size:14px;color:var(--ink2);grid-column:1}
-.jb-w{text-align:right;font-family:var(--mono);font-weight:700;color:var(--copper)}
-.jb-b{text-align:right;font-family:var(--mono);font-size:13px;color:var(--ground)}
-dialog h2:focus{outline:none}
+.jb-w{text-align:right;font-family:var(--display);font-size:20px}
+.jb-b{text-align:right;font-size:13px;font-weight:800;color:var(--red)}
+.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;background:var(--ink);color:var(--paper);padding:11px 14px;display:flex;gap:14px;align-items:center;z-index:60;max-width:calc(100vw - 32px);font-weight:700}
+.toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{background:none;border:0;color:inherit;text-decoration:underline;text-underline-offset:3px;font-weight:900;cursor:pointer;padding:4px}
+
+/* paywall */
 #lock .btn.big{display:flex;align-items:center;justify-content:center;text-decoration:none;width:100%;margin-top:16px}
 #lock .actions .btn{flex:none}
 .salebar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px}
 .salebar span{flex:1 1 100%}
-.salebar a,.salebar button{font:inherit;font-weight:700;color:var(--copper);background:none;border:0;padding:6px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-dialog h3{font-family:var(--display);font-weight:500;font-size:17px;margin:16px 0 4px}
+.salebar a,.salebar button{font:inherit;font-weight:900;color:var(--red);background:none;border:0;padding:6px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+@media (max-width:360px){.now .v{font-size:18px}.now .hi .v{font-size:21px}.grid3{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="top-in">
-    <div class="brand">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 12V6.2M12 12l4.2 2.6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
-      <b>Time Hand</b><span>Stay Cut In</span>
-    </div>
+    <div class="brand"><b>TIME HAND</b><span>STAY CUT IN</span></div>
     <div class="top-btns">
       <button class="icon-btn" id="jobsBtn" type="button" aria-label="Your jobs">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
@@ -260,6 +262,7 @@ dialog h3{font-family:var(--display);font-weight:500;font-size:17px;margin:16px 
   <section id="setup" hidden>
     <h1 class="h1" id="setupTitle">Set up the job</h1>
     <p class="lede">Four answers and the clock can price every second of your shift.</p>
+    <p class="hint" id="restoreHint" hidden><button type="button" class="linkbtn" id="restoreLink" style="padding:0">Moving from another phone? Restore a backup.</button></p>
     <ol class="steps">
       <li class="step">
         <h2 class="h2"><label for="fLocal">Whose agreement are you working under?</label></h2>
@@ -353,20 +356,19 @@ dialog h3{font-family:var(--display);font-weight:500;font-size:17px;margin:16px 
 
   <!-- ───────── CLOCK ───────── -->
   <section id="clock" hidden>
-    <button class="jobstrip" id="jobStrip" type="button" aria-label="Edit job">
-      <span class="js-name" id="jsName"></span>
-      <span class="js-top" id="jsTop"></span>
-      <span class="js-sub" id="jsSub"></span>
-      <span class="js-edit">Edit</span>
-    </button>
+    <div class="jobstrip">
+      <div class="js-main"><span class="js-name" id="jsName"></span><span class="js-top" id="jsTop"></span><span class="js-sub" id="jsSub"></span></div>
+      <button class="btn small" id="jobStrip" type="button">Edit job</button>
+    </div>
 
-    <div class="meter" id="meter">
-      <div class="plate"><span class="dot" id="dot"></span><span class="st" id="status"></span><span class="elapsed" id="elapsed">0:00:00</span></div>
-      <div class="reg-l" id="regLW">Wages this shift</div>
-      <div class="register w" id="regW">$0.00<span class="tail">00</span></div>
-      <div class="disc" id="disc" aria-hidden="true"></div>
-      <div class="reg-l" id="regLB">Benefits this shift</div>
-      <div class="register b" id="regB">$0.00<span class="tail">00</span></div>
+    <div class="flyer" id="meter">
+      <div class="fl-head" aria-live="off"><span id="hdOn">ON THE</span><span class="red">CLOCK</span></div>
+      <div class="fl-since"><span id="status"></span><span class="elapsed" id="elapsed">0:00:00</span></div>
+      <button class="fixbtn" id="fixStart" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z M13.5 6.5l4 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg><span id="fixStartTxt">Change start time</span></button>
+      <div class="fl-band" id="band"></div>
+      <div class="reg-l" id="regLW">You've earned this shift</div>
+      <div class="register w" id="regW"></div>
+      <div class="halftone"><span id="regLB">Plus</span><span class="register" id="regB"></span><span>in benefits</span></div>
       <div class="pkg"><span>Wages and benefits</span><b id="pkg">$0.00</b></div>
       <div class="jobline" id="jobLine"></div>
     </div>
@@ -380,6 +382,7 @@ dialog h3{font-family:var(--display);font-weight:500;font-size:17px;margin:16px 
     <div id="flags"></div>
     <div id="saleBar" class="flag info salebar" hidden></div>
     <div class="modes" id="modes" role="group" aria-label="What the crew is doing"></div>
+    <div class="note-wrap fld" id="noteWrap" hidden><label for="runNote">Notes for this shift</label><textarea id="runNote" rows="3" placeholder="No lunch, dinner furnished. Past 16 on ticket 4471 waiting on a switching order."></textarea><p class="hint">Saves as you type and prints on your timesheet.</p></div>
     <p class="next" id="nextChange" hidden></p>
     <div id="longAlert" class="flag alert" hidden></div>
 
@@ -409,7 +412,7 @@ dialog h3{font-family:var(--display);font-weight:500;font-size:17px;margin:16px 
 
     <section class="sec" aria-labelledby="hShifts">
       <h2 class="h2" id="hShifts">Shifts</h2>
-      <p class="hint" style="margin-top:-4px">Tap a shift to see every fund or fix a time.</p>
+      <p class="hint" style="margin-top:-4px">Tap any shift to fix its times, add notes, or see every fund.</p>
       <ul class="shifts" id="shiftList"></ul>
       <div class="btn-row">
         <button class="btn" id="addShift" type="button">Add a past shift</button>
@@ -424,6 +427,9 @@ dialog h3{font-family:var(--display);font-weight:500;font-size:17px;margin:16px 
         <button class="btn" id="jobsBtn2" type="button">Your jobs</button>
         <button class="btn danger" id="delJob" type="button">Delete this job</button>
       </div>
+      <h3 class="h2" style="font-size:17px;margin:20px 0 4px">Backup</h3>
+      <p class="hint" style="margin-top:0">Shifts live on this phone only. Back them up so a new or broken phone doesn't cost you your history.</p>
+      <div class="btn-row"><button class="btn" id="bkOpen" type="button">Back up my shifts</button><button class="btn" id="rsOpen" type="button">Restore a backup</button></div>
       <div id="licRow" class="info" hidden></div>
     </section>
   </section>
@@ -442,7 +448,7 @@ dialog h3{font-family:var(--display);font-weight:500;font-size:17px;margin:16px 
     <h3 id="sdEditH">Times</h3>
     <div class="fld"><label for="sdStart">Clock in</label><input id="sdStart" type="datetime-local" required></div>
     <div class="fld"><label for="sdEnd">Clock out</label><input id="sdEnd" type="datetime-local"></div>
-    <p class="hint">Leave clock out empty if you're still on the clock.</p>
+    <p class="hint" id="sdEndHint">Leave clock out empty if you're still on the clock.</p>
     <div id="sdSegWrap">
       <h3>What the crew was doing</h3>
       <div id="sdSegs"></div>
@@ -450,6 +456,7 @@ dialog h3{font-family:var(--display);font-weight:500;font-size:17px;margin:16px 
       <p class="hint">Drove in and went to work? Travel from clock in, then a switch to Working at the time you started.</p>
     </div>
     <label class="check"><input type="checkbox" id="sdHol"> Paid holiday</label>
+    <div class="fld"><label for="sdNote">Notes</label><textarea id="sdNote" rows="3" placeholder="Meals, tickets, who you waited on, anything you'll want to remember."></textarea></div>
     <p class="err" id="sdErr" role="alert"></p>
     <div class="dlg-actions">
       <button type="button" class="btn danger" id="sdDelete">Delete</button>
@@ -466,6 +473,26 @@ dialog h3{font-family:var(--display);font-weight:500;font-size:17px;margin:16px 
   <ul class="jobs" id="jobsList"></ul>
   <div id="jobsOld"></div>
   <div class="dlg-actions"><button type="button" class="btn primary" id="jobsAdd">Add a job</button><span class="sp"></span><button type="button" class="btn ghost" id="jobsClose">Done</button></div>
+</dialog>
+
+<dialog id="bkDlg" aria-labelledby="bkTitle">
+  <h2 class="h2" id="bkTitle" tabindex="-1" autofocus>Back up your shifts</h2>
+  <p class="hint">Saves every job and shift. On a new phone, open Time Hand and tap Restore a backup.</p>
+  <p class="hint" id="bkSum"></p>
+  <div class="dlg-actions" style="flex-direction:column;align-items:stretch">
+    <button type="button" class="btn primary" id="bkFile">Save or send the backup file</button>
+    <button type="button" class="btn" id="bkText">Copy backup as text</button>
+    <button type="button" class="btn ghost" id="bkClose">Done</button>
+  </div>
+</dialog>
+
+<dialog id="rsDlg" aria-labelledby="rsTitle">
+  <h2 class="h2" id="rsTitle" tabindex="-1" autofocus>Restore a backup</h2>
+  <p class="hint">Pick the backup file, or paste the backup text. Jobs and shifts already on this phone stay put; the backup adds what's missing.</p>
+  <div class="fld"><label for="rsFile">Backup file</label><input id="rsFile" type="file" accept=".json,application/json,text/plain"></div>
+  <div class="fld"><label for="rsText">Or paste backup text</label><textarea id="rsText" style="min-height:110px" spellcheck="false"></textarea></div>
+  <p class="err" id="rsErr" role="alert"></p>
+  <div class="dlg-actions"><span class="sp"></span><button type="button" class="btn ghost" id="rsCancel">Cancel</button><button type="button" class="btn primary" id="rsGo">Restore</button></div>
 </dialog>
 
 <dialog id="askDlg" aria-labelledby="askText">
@@ -883,13 +910,13 @@ const E = {};
 ['setup','setupTitle','fLocal','localInfo','customLocal','fcName','fcJl','fcHw','fcGf','fcFm','fcPen','fcAnn','fcAnnPer','typeInfo','clsHint','classList','customRateRow','fCustomRate',
  'fOverKind','fOverVal','overHint','stormRules','fsWork','fsStandby','fsTravel','fsSun','fsDtAfter','fsRest','fsRestHrs','resetStorm','regRules','frSt','frOt','frDtAfter','frSat','frSun','resetReg',
  'fBasis','duesFld','fDues','fPerDiem','fPlanned','fMealOn','fMealAmt','fMealEvery','fName','setupErr','saveJob','cancelSetup',
- 'clock','jobStrip','jsName','jsTop','jsSub','flags','dot','status','elapsed','regLW','regW','disc','regLB','regB','pkg','jobLine',
+ 'clock','jobStrip','jsName','jsTop','jsSub','flags','hdOn','fixStart','fixStartTxt','band','status','elapsed','regLW','regW','regLB','regB','pkg','jobLine','noteWrap','runNote','sdNote','sdEndHint',
  'psW','psB','pmW','pmB','phW','phB','nowNote','modes','nextChange','longAlert','funds','deds','dedSec','fColS','dColS',
  'tTodayS','tTodayW','tTodayB','tJobL','tJobS','tJobW','tJobB','tProjRow','tProjL','tProjS','tProjW','tProjB',
  'shiftList','addShift','copySheet','editJob','jobsBtn','jobsBtn2','delJob','dock','clockBtn','themeBtn',
  'shiftDlg','shiftForm','sdTitle','sdDetail','sdEditH','sdStart','sdEnd','sdSegWrap','sdSegs','sdAddSeg','sdHol','sdErr','sdDelete','sdCancel',
  'jobsDlg','jobsList','jobsOld','jobsAdd','jobsClose',
- 'askDlg','askText','askSub','askYes','askNo','lock','lockTitle','lockLede','buyBtn','licCheck','licInput','licGo','lockBack','licErr','saleBar','licRow','copyDlg','copyText','copyClose','toast','toastMsg','toastAct'
+ 'askDlg','askText','askSub','askYes','askNo','bkOpen','rsOpen','restoreHint','restoreLink','bkDlg','bkSum','bkFile','bkText','bkClose','rsDlg','rsFile','rsText','rsErr','rsCancel','rsGo','copyTitle','lock','lockTitle','lockLede','buyBtn','licCheck','licInput','licGo','lockBack','licErr','saleBar','licRow','copyDlg','copyText','copyClose','toast','toastMsg','toastAct'
 ].forEach(id => { E[id] = document.getElementById(id); });
 
 const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -902,7 +929,7 @@ try { theme = localStorage.getItem(THEME_KEY); } catch(e){}
 function applyTheme(){
   if(theme) document.documentElement.setAttribute('data-theme', theme); else document.documentElement.removeAttribute('data-theme');
   const dark = theme ? theme === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  const meta = qs('meta[name="theme-color"]'); if(meta) meta.setAttribute('content', dark ? '#0A1320' : '#E3E7EA');
+  const meta = qs('meta[name="theme-color"]'); if(meta) meta.setAttribute('content', dark ? '#000000' : '#151515');
 }
 applyTheme();
 E.themeBtn.addEventListener('click', () => {
@@ -1115,6 +1142,7 @@ function openSetup(mode){
   E.setupTitle.textContent = mode === 'edit' ? 'Edit job' : (state.jobs.length ? 'Add a job' : 'Set up the job');
   E.saveJob.textContent = mode === 'edit' ? 'Save changes' : 'Save job';
   E.cancelSetup.hidden = !j;
+  E.restoreHint.hidden = state.jobs.length > 0;
   E.setupErr.textContent = '';
   fillForm(); showView();
 }
@@ -1294,6 +1322,8 @@ function renderClock(){
   E.deds.innerHTML = deds.map((d, i) => '<tr><th scope="row">' + esc(d.name) + '<small>' + pctTxt(d.pct) + ' of gross' + (d.sub ? '. ' + esc(d.sub) : '') + '</small></th><td id="ds' + i + '"></td><td id="dj' + i + '"></td></tr>').join('');
   dedCells = deds.map((d, i) => [document.getElementById('ds' + i), document.getElementById('dj' + i), d.pct]);
 
+  E.noteWrap.hidden = !run;
+  if(run && document.activeElement !== E.runNote) E.runNote.value = run.note || '';
   renderShifts();
   renderSale();
   E.clockBtn.textContent = run ? 'Clock out' : 'Clock in';
@@ -1309,22 +1339,25 @@ function renderShifts(){
     const r = S.per.get(s.id), isRun = s.end == null, ch = ctx.chain.get(s.id) || NOCH;
     const tags = (isRun ? '<em>on the clock</em>' : '') + (ch.cont ? '<em>after a break</em>' : '') + (ch.rest ? '<em>short rest</em>' : '') + (s.holiday ? '<em>holiday</em>' : '');
     const segs = job.type === 'storm' && (s.modes || []).length > 1 ? '. ' + segTxt(s) : '';
-    return '<li><button type="button" class="shift-b" data-id="' + esc(s.id) + '">' +
+    return '<li><button type="button" class="shift-b" data-id="' + esc(s.id) + '" aria-label="Edit ' + esc(dateTxt(s.start)) + ' shift">' +
       '<span class="sh-d">' + dateTxt(s.start) + tags + '</span>' +
       '<span class="sh-w"' + (isRun ? ' id="rrW"' : '') + '>' + money(r.wages) + '</span>' +
       '<span class="sh-t">' + timeTxt(s.start) + ' to ' + (isRun ? 'now' : timeTxt(s.end) + (dayKey(s.end) !== dayKey(s.start) ? ' ' + dateTxt(s.end) : '')) + esc(segs) + '</span>' +
       '<span class="sh-b"' + (isRun ? ' id="rrB"' : '') + '>+ ' + money(r.ben) + '</span>' +
       '<span class="sh-h"' + (isRun ? ' id="rrH"' : '') + '>' + hrsTxt(r.ms) + (r.ms ? ': ' + byMultTxt(r) : '') + '</span>' +
+      (s.note ? '<span class="sh-note"><b>Note</b>' + esc(s.note.length > 90 ? s.note.slice(0, 88) + '…' : s.note) + '</span>' : '') +
+      '<span class="sh-edit" aria-hidden="true">Edit</span>' +
       '</button></li>';
   }).join('');
   if(running()) runRow = {w:document.getElementById('rrW'), b:document.getElementById('rrB'), h:document.getElementById('rrH')};
 }
 function setReg(el, n){
   const s = Math.max(0, n).toFixed(4), p = s.split('.');
-  const main = '$' + Number(p[0]).toLocaleString('en-US') + '.' + p[1].slice(0, 2);
-  const t = el.firstChild, tail = el.lastChild;
-  if(t && t.nodeType === 3 && tail && tail.className === 'tail'){ if(t.nodeValue !== main) t.nodeValue = main; tail.textContent = p[1].slice(2); }
-  else el.innerHTML = esc(main) + '<span class="tail">' + p[1].slice(2) + '</span>';
+  const main = '$' + Number(p[0]).toLocaleString('en-US') + '.' + p[1].slice(0, 2), tail = p[1].slice(2);
+  const key = main + tail; if(el._k === key) return; el._k = key;
+  const dg = t => t.split('').map(c => /\d/.test(c) ? '<span class="dg">' + c + '</span>' : c).join('');
+  el.innerHTML = dg(main) + '<span class="tail">' + dg(tail) + '</span>';
+  el.setAttribute('aria-label', main);
 }
 let lastTitle = 0;
 function tick(force){
@@ -1333,30 +1366,31 @@ function tick(force){
   const run = S.run, cur = run ? S.runRes : (S.lastRes || null);
   const w = cur ? cur.wages : 0, b = cur ? cur.ben : 0;
 
-  E.dot.classList.toggle('on', !!run);
+  E.hdOn.textContent = run ? 'ON THE' : 'OFF THE';
+  E.fixStartTxt.textContent = run ? 'Wrong start time? Change it' : 'Forgot to clock in? Start from an earlier time';
   if(run){
-    E.status.textContent = 'On the clock since ' + timeTxt(run.start) + (dayKey(run.start) !== dayKey(now) ? ', ' + dateTxt(run.start) : '');
+    E.status.textContent = 'Since ' + timeTxt(run.start) + (dayKey(run.start) !== dayKey(now) ? ', ' + dateTxt(run.start) : '');
     E.elapsed.textContent = hms(now - run.start);
-    E.regLW.textContent = 'Wages this shift'; E.regLB.textContent = 'Benefits this shift';
+    E.regLW.textContent = "You've earned this shift"; E.regLB.textContent = 'Plus';
   } else if(S.last){
-    E.status.textContent = 'Off the clock. Last shift ended ' + timeTxt(S.last.end) + ', ' + dateTxt(S.last.end);
+    E.status.textContent = 'Last shift ended ' + timeTxt(S.last.end) + ', ' + dateTxt(S.last.end);
     E.elapsed.textContent = hms(S.last.end - S.last.start);
-    E.regLW.textContent = 'Wages, last shift'; E.regLB.textContent = 'Benefits, last shift';
+    E.regLW.textContent = 'Earned last shift'; E.regLB.textContent = 'Plus';
   } else {
-    E.status.textContent = 'Off the clock. Ready when you are.';
+    E.status.textContent = 'Ready when you are';
     E.elapsed.textContent = '0:00:00';
-    E.regLW.textContent = 'Wages this shift'; E.regLB.textContent = 'Benefits this shift';
+    E.regLW.textContent = "You've earned this shift"; E.regLB.textContent = 'Plus';
   }
   setReg(E.regW, w); setReg(E.regB, b);
   E.pkg.textContent = money(w + b);
   E.jobLine.innerHTML = 'Whole job so far: <b>' + money(S.job.wages) + '</b> wages, <b>' + money(S.job.ben) + '</b> benefits';
-  if(!reduceMotion) E.disc.style.backgroundPosition = ((w * 900) % 120).toFixed(1) + 'px 0, 0 0';
 
   const I = instant(ctx, run, now);
   E.psW.textContent = money4(I.wage / 3600); E.psB.textContent = '+ ' + money4(I.ben / 3600);
   E.pmW.textContent = money(I.wage / 60); E.pmB.textContent = '+ ' + money(I.ben / 60);
   E.phW.textContent = money(I.wage); E.phB.textContent = '+ ' + money(I.ben);
   const modeCap = job.type === 'storm' ? MODE_NAME[I.mode] : 'Paid';
+  E.band.textContent = ctx.cls.name + ' · ' + (job.type === 'storm' ? MODE_NAME[I.mode] + ' ' : 'Paying ') + multTxt(I.m) + ' · ' + money(I.R);
   E.nowNote.textContent = (run ? modeCap + ' at ' : 'Clock in now: ') + multTxt(I.m) + ' on ' + money(I.R) + '. Wages and benefits together: ' + money((I.wage + I.ben) / 60) + ' a minute.';
 
   if(run){
@@ -1497,11 +1531,14 @@ function renderSegs(segs){
     '</div>').join('');
 }
 function readSegs(){ return qsa('.seg-row', E.sdSegs).map((row, i) => ({time:i === 0 ? null : (qs('.seg-time', row).value || ''), m:qs('.seg-mode', row).value})); }
-function openShift(id){
+function openShift(id, opts){
+  opts = opts || {};
   const job = activeJob();
   editing = id ? job.shifts.find(s => s.id === id) : null;
   E.sdErr.textContent = '';
-  E.sdTitle.textContent = editing ? dateTxt(editing.start) + ' shift' : 'Add a past shift';
+  E.sdTitle.textContent = editing ? 'Edit ' + dateTxt(editing.start) + ' shift' : (opts.startNow ? 'When did you start?' : 'Add a past shift');
+  E.sdNote.value = editing ? (editing.note || '') : '';
+  E.sdEndHint.textContent = opts.startNow ? "Leave clock out empty. The clock runs from your start time." : "Leave clock out empty if you're still on the clock.";
   E.sdDetail.innerHTML = editing ? detailHtml(job, editing) : '';
   E.sdEditH.textContent = editing ? 'Fix the times' : 'Times';
   E.sdDelete.hidden = !editing;
@@ -1518,8 +1555,22 @@ function openShift(id){
   E.sdSegWrap.hidden = job.type !== 'storm';
   const mods = editing ? (editing.modes || []) : [];
   renderSegs(mods.length ? mods.map((c, i) => ({time:i ? hhmm(c.t) : null, m:c.m})) : [{time:null, m:'work'}]);
+  if(opts.startNow){
+    const d = new Date(now); d.setMinutes(d.getMinutes() < 30 ? 0 : 30, 0, 0); if(d.getTime() > now - 15 * 60000) d.setMinutes(d.getMinutes() - 30);
+    E.sdStart.value = toInput(d.getTime()); E.sdEnd.value = '';
+    E.sdDetail.innerHTML = ''; E.sdEditH.textContent = 'Times';
+  }
   E.shiftDlg.showModal();
+  if(opts.focusStart) setTimeout(() => E.sdStart.focus(), 50);
 }
+E.fixStart.addEventListener('click', () => { const r = running(); if(r) openShift(r.id, {focusStart:true}); else openShift(null, {startNow:true}); });
+let noteTimer = null;
+E.runNote.addEventListener('input', () => {
+  const r = running(); if(!r) return;
+  r.note = E.runNote.value;
+  clearTimeout(noteTimer); noteTimer = setTimeout(() => { persist(); }, 500);
+});
+E.runNote.addEventListener('blur', () => { const r = running(); if(r){ r.note = E.runNote.value; persist(); renderShifts(); } });
 E.sdAddSeg.addEventListener('click', () => {
   const segs = readSegs(), st = fromInput(E.sdStart.value) || Date.now(), en = fromInput(E.sdEnd.value);
   const lastT = segs.length > 1 && segs[segs.length - 1].time ? resolveClock(st, segs[segs.length - 1].time) : st;
@@ -1582,9 +1633,77 @@ E.shiftForm.addEventListener('submit', ev => {
   if(err) return;
   const sh = editing || {id:uid()};
   sh.start = st; sh.end = en; sh.holiday = E.sdHol.checked; sh.modes = modes;
+  const note = E.sdNote.value.trim(); if(note) sh.note = note; else delete sh.note;
   if(!editing) job.shifts.push(sh);
   persist(); E.shiftDlg.close(); renderClock();
   toast(editing ? 'Shift saved' : 'Shift added');
+});
+
+/* backup + restore */
+function ymd(ms){ const d = new Date(ms); return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()); }
+function backupText(){ return JSON.stringify({app:'timehand', kind:'backup', v:2, exportedAt:Date.now(), jobs:state.jobs, activeId:state.activeId, history:state.history || []}); }
+function openBackup(){
+  const shifts = state.jobs.reduce((n, j) => n + j.shifts.length, 0);
+  E.bkSum.textContent = state.jobs.length + ' job' + (state.jobs.length === 1 ? '' : 's') + ', ' + shifts + ' shift' + (shifts === 1 ? '' : 's') + '.';
+  E.bkDlg.showModal();
+}
+async function saveBackupFile(){
+  const txt = backupText(), name = 'time-hand-backup-' + ymd(Date.now()) + '.json';
+  try {
+    const f = new File([txt], name, {type:'application/json'});
+    if(navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f], title:'Time Hand backup'}); E.bkDlg.close(); toast('Backup ready'); return; }
+  } catch(e){ if(e && e.name === 'AbortError') return; }
+  try {
+    const url = URL.createObjectURL(new Blob([txt], {type:'application/json'}));
+    const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    E.bkDlg.close(); toast('Backup saved to your downloads');
+  } catch(e){ copyBackupText(); }
+}
+function showText(title, txt){ E.copyTitle.textContent = title; E.copyText.value = txt; E.copyDlg.showModal(); E.copyText.focus(); E.copyText.select(); }
+function copyBackupText(){
+  const txt = backupText();
+  E.bkDlg.close();
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(() => toast('Backup copied. Paste it somewhere safe, like a note or an email to yourself.'), () => showText('Backup', txt));
+  else showText('Backup', txt);
+}
+function parseBackup(txt){
+  let o; try { o = JSON.parse(String(txt || '').trim()); } catch(e){ return null; }
+  return o && o.app === 'timehand' && Array.isArray(o.jobs) ? o : null;
+}
+function mergeBackup(o){
+  let jobs = 0, shifts = 0;
+  o.jobs.forEach(bj => {
+    if(!bj || !Array.isArray(bj.shifts) || !(bj.localId === 'custom' || LOC[bj.localId])) return;
+    const ex = state.jobs.find(j => j.id === bj.id);
+    if(!ex){ state.jobs.push(bj); jobs++; shifts += bj.shifts.length; return; }
+    bj.shifts.forEach(s => { if(!ex.shifts.some(x => x.id === s.id)){ ex.shifts.push(s); shifts++; } });
+  });
+  const seen = new Set((state.history || []).map(h => JSON.stringify(h)));
+  (o.history || []).forEach(h => { const k = JSON.stringify(h); if(!seen.has(k)){ state.history.push(h); seen.add(k); } });
+  if(!activeJob()) state.activeId = (o.activeId && state.jobs.some(j => j.id === o.activeId)) ? o.activeId : (state.jobs[0] ? state.jobs[0].id : null);
+  persist();
+  return {jobs, shifts};
+}
+function openRestore(){ E.rsErr.textContent = ''; E.rsText.value = ''; E.rsFile.value = ''; E.rsDlg.showModal(); }
+E.bkOpen.addEventListener('click', openBackup);
+E.bkFile.addEventListener('click', saveBackupFile);
+E.bkText.addEventListener('click', copyBackupText);
+E.bkClose.addEventListener('click', () => E.bkDlg.close());
+E.rsOpen.addEventListener('click', openRestore);
+E.restoreLink.addEventListener('click', openRestore);
+E.rsCancel.addEventListener('click', () => E.rsDlg.close());
+E.rsGo.addEventListener('click', async () => {
+  let txt = E.rsText.value;
+  const f = E.rsFile.files && E.rsFile.files[0];
+  if(f){ try { txt = await f.text(); } catch(e){ E.rsErr.textContent = "Couldn't read that file."; return; } }
+  if(!String(txt).trim()){ E.rsErr.textContent = 'Pick a backup file or paste the backup text.'; return; }
+  const o = parseBackup(txt);
+  if(!o){ E.rsErr.textContent = "That isn't a Time Hand backup."; return; }
+  const r = mergeBackup(o);
+  E.rsDlg.close();
+  if(activeJob()) goClock(); else openSetup('new');
+  toast(r.jobs || r.shifts ? 'Restored ' + r.jobs + ' job' + (r.jobs === 1 ? '' : 's') + ' and ' + r.shifts + ' shift' + (r.shifts === 1 ? '' : 's') + '.' : 'Everything in that backup is already on this phone.');
 });
 
 /* timesheet */
@@ -1598,6 +1717,7 @@ function sheetText(){
     if(job.type === 'storm' && (s.modes || []).length > 1) lines.push('    ' + segTxt(s));
     lines.push('    wages ' + money(r.wages) + ', benefits ' + money(r.ben) + (r.meals ? ', meals ' + money(r.meals) : ''));
     if(ctx.funds.length) lines.push('    ' + ctx.funds.map((f, i) => f.name + ' ' + money(r.funds[i])).join(', '));
+    if(s.note) lines.push('    Note: ' + s.note.replace(/\s+/g, ' '));
   });
   lines.push('', 'Total ' + (S.job.ms / H).toFixed(2) + ' h. Wages ' + money(S.job.wages) + '. Benefits ' + money(S.job.ben) + '.' + (S.job.perDiem + S.job.meals > 0 ? ' Per diem and meals ' + money(S.job.perDiem + S.job.meals) + '.' : ''));
   if(ctx.funds.length && S.job.funds) lines.push(ctx.funds.map((f, i) => f.name + ' ' + money(S.job.funds[i])).join('. ') + '.');
@@ -1606,7 +1726,7 @@ function sheetText(){
 }
 E.copySheet.addEventListener('click', () => {
   const txt = sheetText();
-  const fallback = () => { E.copyText.value = txt; E.copyDlg.showModal(); E.copyText.focus(); E.copyText.select(); };
+  const fallback = () => showText('Timesheet', txt);
   if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(() => toast('Timesheet copied'), fallback); }
   else fallback();
 });

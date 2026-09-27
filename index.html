@@ -3,100 +3,95 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0A1320">
+<meta name="theme-color" content="#151515">
 <meta name="description" content="Time Hand is a pay clock for linemen. Clock in and watch your wages and every benefit fund add up by the second, priced by your local's agreement. 7 days free, then $19.99 a year.">
 <title>Time Hand · A pay clock for linemen</title>
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&family=Oswald:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Libre+Franklin:wght@400;500;700;800;900&display=swap">
 <style>
 :root{
-  --bg:#E3E7EA; --face:#F8F9F7; --panel:#FFFFFF; --ink:#0F1B2D; --ink2:#394657; --ink3:#5F6C7D; --line:#C8CFD6;
-  --bezel:#B7C0C9; --copper:#A4521A; --ground:#1C7547; --warn:#8A6700; --btn-ink:#FFFFFF;
-  --display:'Oswald','Arial Narrow',Impact,sans-serif;
-  --body:'Barlow',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
-  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --paper:#F3EDE0; --ink:#151515; --ink2:#3B3733; --ink3:#5E5850; --red:#B7222A; --on-red:#FBF6EC; --dot:rgba(21,21,21,.30);
+  --display:'Anton','Oswald',Impact,'Arial Narrow',sans-serif;
+  --body:'Libre Franklin','Franklin Gothic Medium','Helvetica Neue',sans-serif;
   color-scheme:light; box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --bg:#0A1320; --face:#0E1929; --panel:#111E31; --ink:#EDF1F5; --ink2:#B5C0CD; --ink3:#8391A3; --line:#233550;
-    --bezel:#28394F; --copper:#EE9447; --ground:#4FC48D; --warn:#E9BE3A; --btn-ink:#0A1320; color-scheme:dark;
-  }
+  :root:not([data-theme="light"]){ --paper:#161513; --ink:#EFE7D6; --ink2:#D2C9B7; --ink3:#A89F8D; --red:#E0544A; --on-red:#161513; --dot:rgba(0,0,0,.35); color-scheme:dark; }
 }
-:root[data-theme="dark"]{
-  --bg:#0A1320; --face:#0E1929; --panel:#111E31; --ink:#EDF1F5; --ink2:#B5C0CD; --ink3:#8391A3; --line:#233550;
-  --bezel:#28394F; --copper:#EE9447; --ground:#4FC48D; --warn:#E9BE3A; --btn-ink:#0A1320; color-scheme:dark;
-}
+:root[data-theme="dark"]{ --paper:#161513; --ink:#EFE7D6; --ink2:#D2C9B7; --ink3:#A89F8D; --red:#E0544A; --on-red:#161513; --dot:rgba(0,0,0,.35); color-scheme:dark; }
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
-a{color:var(--copper)}
-:focus-visible{outline:3px solid var(--copper);outline-offset:2px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+a{color:var(--red)}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
 .wrap{max-width:560px;margin:0 auto;padding:0 18px}
-.top::after{content:"";display:block;height:4px;background:repeating-linear-gradient(-45deg,var(--warn) 0 8px,transparent 8px 16px);opacity:.8}
+.top{background:#151515;color:#F3EDE0;border-bottom:4px solid var(--red)}
 .top-in{max-width:560px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:10px}
-.brand{display:flex;align-items:center;gap:8px;flex:1;text-decoration:none;color:inherit}
-.brand svg{width:22px;height:22px;color:var(--copper)}
-.brand b{font-family:var(--display);font-weight:600;font-size:24px}
-.top a.open{font-weight:700;text-decoration:none;padding:10px 0}
-h1{font-family:var(--display);font-weight:600;font-size:clamp(38px,11vw,54px);line-height:1.02;margin:32px 0 12px;letter-spacing:.005em}
-h2{font-family:var(--display);font-weight:600;font-size:26px;line-height:1.15;margin:0 0 12px}
+.brand{flex:1;display:flex;align-items:baseline;gap:10px;text-decoration:none;color:inherit}
+.brand b{font-family:var(--display);font-weight:400;font-size:27px;letter-spacing:.04em;line-height:1;white-space:nowrap}
+.brand span{font-size:11px;font-weight:800;letter-spacing:.18em;white-space:nowrap}
+@media (max-width:420px){.brand span{display:none}}
+.top a.open{color:#F3EDE0;font-weight:900;font-size:14px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;border:2px solid #F3EDE0;padding:9px 12px}
+.hero-logo{display:block;width:min(280px,72vw);height:auto;aspect-ratio:1/1;margin:26px 0 0;border-radius:18%;box-shadow:6px 6px 0 var(--ink);transform:rotate(-2deg)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(64px,19vw,104px);line-height:.88;margin:28px 0 14px;text-transform:uppercase}
+h1 .red{color:var(--red)}
+h2{font-family:var(--display);font-weight:400;font-size:32px;line-height:1;margin:0 0 12px;text-transform:uppercase}
 .lede{font-size:19px;color:var(--ink2);margin:0 0 22px}
-.cta{display:flex;align-items:center;justify-content:center;height:60px;border-radius:14px;background:var(--copper);color:var(--btn-ink);font-family:var(--display);font-size:23px;font-weight:500;text-decoration:none;box-shadow:0 6px 20px rgba(0,0,0,.16)}
-.cta-sub{text-align:center;font-size:15px;color:var(--ink3);margin:10px 0 0}
-.meter{margin:30px 0 8px;padding:16px 18px;border-radius:28px;background:var(--face);border:7px solid var(--bezel)}
-.plate{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2)}
-.dot{width:10px;height:10px;border-radius:50%;background:var(--copper);flex:none}
-.plate span:last-child{margin-left:auto;font-family:var(--mono);font-weight:600}
-.lbl{font-size:14px;color:var(--ink3);margin-top:10px}
-.reg{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.03em;line-height:1.05;white-space:nowrap}
-.reg small{font-size:.42em;opacity:.55;letter-spacing:0}
-.reg.w{font-size:clamp(34px,11vw,48px);color:var(--copper)}
-.reg.b{font-size:clamp(26px,8vw,34px);color:var(--ground)}
-.rates{display:flex;justify-content:space-between;gap:8px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:14px;color:var(--ink2)}
-.rates b{font-family:var(--mono);color:var(--copper)}
-.demo-note{font-size:13px;color:var(--ink3);text-align:center;margin:0 0 6px}
-section{padding:30px 0 6px;border-top:1px solid var(--line);margin-top:30px}
+.cta{display:flex;align-items:center;justify-content:center;height:62px;background:var(--red);color:var(--on-red);border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink);font-family:var(--display);font-size:28px;letter-spacing:.05em;text-transform:uppercase;text-decoration:none}
+.cta-sub{text-align:center;font-size:15px;color:var(--ink3);margin:12px 0 0;font-weight:600}
+.band{margin:30px 0 16px;border-top:4px solid var(--ink);border-bottom:4px solid var(--ink);padding:7px 0;text-align:center;font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.lbl{font-size:13px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}
+.reg{font-family:var(--display);font-weight:400;line-height:1;white-space:nowrap}
+.reg .dg{display:inline-block;width:.52em;text-align:center}
+.reg small{font-size:.4em;opacity:.55;margin-left:.08em}
+.reg.w{font-size:clamp(58px,17vw,84px)}
+.halftone{display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin-top:8px;padding:6px 10px;background-color:var(--red);background-image:radial-gradient(var(--dot) 1.1px,transparent 1.3px);background-size:6px 6px;color:var(--on-red);font-weight:900;font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+.halftone .reg{font-size:30px}
+.rates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+.rates div{border:3px solid var(--ink);padding:8px 10px}
+.rates b{display:block;font-family:var(--display);font-weight:400;font-size:30px;line-height:1.05}
+.rates span{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.demo-note{font-size:13px;color:var(--ink3);margin:10px 0 0;font-weight:600}
+section{padding:28px 0 4px;border-top:4px solid var(--ink);margin-top:32px}
 .feat{list-style:none;margin:0;padding:0}
-.feat li{padding:12px 0;border-bottom:1px solid var(--line)}
+.feat li{padding:12px 0;border-bottom:2px solid var(--ink)}
 .feat li:last-child{border-bottom:0}
-.feat b{display:block;font-size:18px}
+.feat b{display:block;font-size:17px;font-weight:900;text-transform:uppercase;letter-spacing:.03em}
 .feat span{color:var(--ink2)}
-.price{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}
-.price b{font-family:var(--display);font-weight:600;font-size:52px;line-height:1;color:var(--copper)}
-.price span{font-size:18px;color:var(--ink2)}
+.price{display:flex;align-items:baseline;gap:12px;margin:0 0 6px}
+.price b{font-family:var(--display);font-weight:400;font-size:72px;line-height:1;color:var(--red)}
+.price span{font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
 .plain{margin:10px 0 0;padding-left:20px;color:var(--ink2)}
 .plain li{margin:4px 0}
-.fine h3{font-family:var(--display);font-weight:500;font-size:19px;margin:18px 0 4px}
+.fine h3{font-family:var(--display);font-weight:400;font-size:21px;text-transform:uppercase;margin:18px 0 4px}
 .fine p{margin:0 0 8px;color:var(--ink2);font-size:15px}
-footer{padding:26px 0 40px;font-size:14px;color:var(--ink3);border-top:1px solid var(--line);margin-top:30px}
+footer{padding:22px 0 40px;font-size:14px;color:var(--ink3);border-top:4px solid var(--ink);margin-top:32px}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="top-in">
-    <a class="brand" href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 12V6.2M12 12l4.2 2.6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><b>Time Hand</b></a>
+    <a class="brand" href="#"><b>TIME HAND</b><span>STAY CUT IN</span></a>
     <a class="open" href="app.html">Open the app</a>
   </div>
 </header>
 
 <main class="wrap">
-  <h1>Watch your storm check build by the second.</h1>
-  <p class="lede">Time Hand is a pay clock for linemen. Clock in and your wages and every benefit fund add up live, priced by your local's agreement, your classification, and the storm or overtime rules you're working under.</p>
+  <img class="hero-logo" src="logo.jpg" width="280" height="280" alt="Old punch clock on a wood-paneled wall next to a Be a Hand, Look Up and Live safety poster">
+  <h1>Watch your check <span class="red">build.</span></h1>
+  <p class="lede">Time Hand is a pay clock for linemen. Clock in and your wages and every benefit fund add up by the second, priced by your local's agreement, your classification, and the storm or overtime rules you're working under.</p>
   <a class="cta" href="app.html">Try it free for 7 days</a>
   <p class="cta-sub">Then $19.99 a year. No account, no sign-up. Works on any phone.</p>
 
-  <div class="meter" aria-label="Live demo of the Time Hand meter">
-    <div class="plate"><span class="dot"></span><span>On the clock since 7:00 AM</span><span id="dEl">11:32:00</span></div>
-    <div class="lbl">Wages this shift</div>
-    <div class="reg w" id="dW">$1,866.23<small>00</small></div>
-    <div class="lbl">Benefits this shift</div>
-    <div class="reg b" id="dB">$1,306.36<small>00</small></div>
-    <div class="rates"><span>Per minute <b>$2.70</b></span><span>Per hour <b>$161.86</b></span></div>
-  </div>
-  <p class="demo-note">Demo: LU 456 general foreman on a storm at double time.</p>
+  <div class="band">Demo: LU 456 general foreman · storm double time · $80.93</div>
+  <div class="lbl">You've earned this shift</div>
+  <div class="reg w" id="dW" aria-label="Demo wages">$1,866.23</div>
+  <div class="halftone"><span>Plus</span><span class="reg" id="dB">$1,306.36</span><span>in benefits</span></div>
+  <div class="rates"><div><b>$2.70</b><span>A minute</span></div><div><b>$161.86</b><span>An hour</span></div></div>
 
   <section aria-labelledby="h-what">
     <h2 id="h-what">What it does</h2>
@@ -105,8 +100,9 @@ footer{padding:26px 0 40px;font-size:14px;color:var(--ink3);border-top:1px solid
       <li><b>Storm or regular work</b><span>Tap Working, Standby, or Travel as the day changes. It handles double time after long hours, short rest between shifts, Sundays, and holidays.</span></li>
       <li><b>Every benefit fund, separately</b><span>Annuity, pension, health and welfare, NEBF, plus dues and anything else off your check, for the shift and the whole job.</span></li>
       <li><b>Over scale covered</b><span>Getting more than the contract? Add dollars an hour, a percent, your own rate, or your own storm multiplier.</span></li>
-      <li><b>Log what you already worked</b><span>Add yesterday or a whole past storm, including days that were part travel and part work. Keep every job saved and switch between them.</span></li>
-      <li><b>Check your stub</b><span>Copy a timesheet with hours at each rate and every fund, shift by shift.</span></li>
+      <li><b>Forgot to clock in? Fix it</b><span>Set the real start time and the clock catches up. Add yesterday or a whole past storm, including days that were part travel and part work.</span></li>
+      <li><b>Notes on every shift</b><span>No lunch but dinner furnished, past 16 on a ticket waiting on a switching order. Write it down while you remember it.</span></li>
+      <li><b>Check your stub</b><span>Copy a timesheet with hours at each rate, every fund, and your notes, shift by shift.</span></li>
     </ul>
   </section>
 
@@ -119,7 +115,7 @@ footer{padding:26px 0 40px;font-size:14px;color:var(--ink3);border-top:1px solid
       <li>Wage rates get updated as agreements change.</li>
       <li>Cancel anytime from the link in your receipt email.</li>
     </ul>
-    <p style="margin-top:18px"><a class="cta" href="app.html">Start the free week</a></p>
+    <p style="margin-top:22px"><a class="cta" href="app.html">Start the free week</a></p>
   </section>
 
   <section aria-labelledby="h-who">
@@ -132,7 +128,7 @@ footer{padding:26px 0 40px;font-size:14px;color:var(--ink3);border-top:1px solid
     <h3 id="terms">Terms</h3>
     <p>Time Hand gives estimates using the rates and rules shown for each agreement. It isn't payroll, and it isn't legal or financial advice. Agreements change, so confirm rates with your hall and your agreement. Your subscription renews each year until you cancel.</p>
     <h3 id="privacy">Privacy</h3>
-    <p>Your shifts and settings stay on your phone. Time Hand has no accounts and doesn't collect, track, or sell your data. When you enter a license key, the app checks it with Lemon Squeezy, which handles checkout and billing under its own privacy policy.</p>
+    <p>Your shifts, notes and settings stay on your phone. Time Hand has no accounts and doesn't collect, track, or sell your data. When you enter a license key, the app checks it with Lemon Squeezy, which handles checkout and billing under its own privacy policy.</p>
     <h3 id="refunds">Refunds</h3>
     <p>If Time Hand doesn't work for you, email within 14 days of paying and you'll get a full refund.</p>
     <h3 id="contact">Contact</h3>
@@ -146,14 +142,11 @@ footer{padding:26px 0 40px;font-size:14px;color:var(--ink3);border-top:1px solid
 (function(){
   var rate = 161.86, ben = 0.70, start = Date.now() - (11 * 3600 + 32 * 60) * 1000;
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var W = document.getElementById('dW'), B = document.getElementById('dB'), El = document.getElementById('dEl');
-  function fmt(n){ var s = n.toFixed(4), p = s.split('.'); return '$' + Number(p[0]).toLocaleString('en-US') + '.' + p[1].slice(0,2) + '<small>' + p[1].slice(2) + '</small>'; }
-  function tick(){
-    var ms = Date.now() - start, h = ms / 3600000, s = Math.floor(ms / 1000);
-    W.innerHTML = fmt(rate * h); B.innerHTML = fmt(rate * ben * h);
-    El.textContent = Math.floor(s / 3600) + ':' + String(Math.floor(s % 3600 / 60)).padStart(2,'0') + ':' + String(s % 60).padStart(2,'0');
-  }
-  tick(); setInterval(tick, reduce ? 1000 : 80);
+  var W = document.getElementById('dW'), B = document.getElementById('dB');
+  function dg(t){ return t.split('').map(function(c){ return /\d/.test(c) ? '<span class="dg">' + c + '</span>' : c; }).join(''); }
+  function fmt(n){ var s = n.toFixed(4), p = s.split('.'); return dg('$' + Number(p[0]).toLocaleString('en-US') + '.' + p[1].slice(0,2)) + '<small>' + dg(p[1].slice(2)) + '</small>'; }
+  function tick(){ var h = (Date.now() - start) / 3600000; W.innerHTML = fmt(rate * h); B.innerHTML = fmt(rate * ben * h); }
+  tick(); setInterval(tick, reduce ? 1000 : 90);
 })();
 </script>
 </body>
