@@ -612,7 +612,7 @@ function G(o){
     benBasis:o.benBasis || 'gross',
     deductions:o.deductions || null,
     duesPct:o.duesPct == null ? 3 : o.duesPct,
-    storm:o.storm || S_UNK(), reg:o.reg || R_STD(), meal:o.meal || null
+    storm:o.storm || S_UNK(), reg:o.reg || R_STD(), meal:o.meal || null, allowances:o.allowances || []
   };
 }
 
@@ -621,6 +621,36 @@ const L1249 = (id, zone, jl) => G({id, lu:'LU 1249', name:'New York, '+zone, reg
   classes:[{id:'gf',name:'General foreman',pct:120},{id:'fm',name:'Foreman',pct:113},{id:'wf',name:'Working foreman',pct:110},{id:'jl',name:'Journeyman lineman',pct:100}].concat(apprentices(false)),
   benefits:[{name:'Health & welfare',per:'hr',amt:10.40},{name:'Pension',per:'hr',amt:14.50},{name:'Annuity (JL amount)',per:'hr',amt:8.00},{name:'NEBF',per:'pct',amt:3}],
   benConf:'contract', storm:ST_1249(), meal:{amt:25, every:5}});
+
+/* LU 71 & 245, Agreement 4-71/245-A (1/1/24 to 1/3/27) */
+const LU71_RATES = [{eff:'2024-01-01',jl:47.99},{eff:'2025-01-06',jl:50.15},{eff:'2026-01-05',jl:52.28}];
+const LU71_SRC = 'Agreement 4-71/245-A, Section 5.01(a). 2026 = the 1/6/25 posted wage plus the 4.25% raise effective 1/5/26';
+const LU71_CLASSES = () => [
+  {id:'gf',name:'Foreman',pct:110},
+  {id:'wf',name:'Working foreman',sub:'Paid the line foreman rate (Section 4.14)',pct:110},
+  {id:'fm',name:'Sub-foreman',pct:105},
+  {id:'hdf',name:'Foreman, hole digger',pct:100},
+  {id:'jl',name:'Journeyman lineman',pct:100},
+  {id:'sub',name:'Substation technician',pct:100},
+  {id:'spl',name:'Cable splicer',rates:[{eff:'2024-01-01',rate:50.26},{eff:'2025-01-06',rate:52.52},{eff:'2026-01-05',rate:54.75}]}
+].concat(apprentices(true), [
+  {id:'emc',name:'Equipment mechanic "C"',rates:[{eff:'2024-01-01',rate:30.52},{eff:'2025-01-06',rate:31.89},{eff:'2026-01-05',rate:33.25}]},
+  {id:'emb',name:'Equipment mechanic "B"',rates:[{eff:'2024-01-01',rate:34.28},{eff:'2025-01-06',rate:35.82},{eff:'2026-01-05',rate:37.34}]},
+  {id:'ema',name:'Equipment mechanic "A"',rates:[{eff:'2024-01-01',rate:38.02},{eff:'2025-01-06',rate:39.73},{eff:'2026-01-05',rate:41.42}]},
+  {id:'opc',name:'Operator "C"',sub:'Trencher, backhoe, compactor, ground rod driver, boom truck 6 ton and under, skid steer, material handler',rates:[{eff:'2024-01-01',rate:30.52},{eff:'2025-01-06',rate:31.89},{eff:'2026-01-05',rate:33.25}]},
+  {id:'opb',name:'Operator "B"',sub:'Cranes over 6 up to 25 ton, backhoes, road tractor, dozer to D-5, pressure digger, tension stringing equipment',rates:[{eff:'2024-01-01',rate:38.02},{eff:'2025-01-06',rate:39.73},{eff:'2026-01-05',rate:41.42}]},
+  {id:'opa',name:'Operator "A"',sub:'Rock drill, D-6 and up, trackhoe digger, cranes over 25 and under 45 ton',rates:[{eff:'2024-01-01',rate:43.01},{eff:'2025-01-06',rate:44.95},{eff:'2026-01-05',rate:46.86}]},
+  {id:'crane45',name:'Crane operator, 45 ton and up',sub:'Paid the journeyman lineman rate',pct:100},
+  {id:'aug',name:'Line truck with auger',rates:[{eff:'2024-01-01',rate:33.65},{eff:'2025-01-06',rate:35.16},{eff:'2026-01-05',rate:36.65}]},
+  {id:'gm1',name:'Groundman / truck driver, first year',pct:50},
+  {id:'gm1c',name:'Groundman / truck driver, first year, with CDL',pct:55},
+  {id:'gm2',name:'Groundman / truck driver, 1 year or over',pct:55},
+  {id:'gm2c',name:'Groundman / truck driver, 1 year or over, with CDL',pct:65}
+]);
+const LU71_BEN = () => [{name:'Health & welfare (LINECO)',per:'hr',amt:7.50},{name:'Health reimbursement (HRA)',per:'hr',amt:0.75},{name:'NEBF',per:'pct',amt:3},{name:'Annuity (NEAP)',per:'pct',amt:24}];
+const LU71_ALLOW = () => [{name:'FR clothing allowance', perHr:0.40}];
+const LU71_STORM = () => S(1.5, 1.5, 1.5, 2, null, 'contract', "Section 4.18 storm or emergency work: 1.5× for all hours Monday to Friday and the first 8 hours Saturday. 2× after 8 hours Saturday and all day Sunday and holidays. Mandatory 8-hour rest after the day's last assignment. 4-hour minimum on a call-out (not figured in). Meals and lodging paid; $19 meal allowance when a meal isn't provided, meal period every 6 hours.", {wkndDtAfter:8, restRule:false});
+const LU71_BASE = {region:'Midwest', conf:'contract', rates:LU71_RATES, benConf:'contract', duesPct:0, meal:{amt:19, every:6}};
 
 const LOCALS = [
   /* Northeast */
@@ -697,7 +727,42 @@ const LOCALS = [
   G({id:'649', lu:'LU 649', name:'Alton, Illinois', region:'Midwest', jl:61.41, conf:'contract', src:'LU 649 agreement'}),
   G({id:'51', lu:'LU 51', name:'Illinois / Indiana line', region:'Midwest', jl:63.97, conf:'check', rateNote:'Also seen: $61.36. Confirm with the hall.', src:'LU 51 agreement (2027)', lineco:7.50}),
   G({id:'1393', lu:'LU 1393', name:'Indiana', region:'Midwest', jl:52.72, conf:'check', rateNote:'Also seen: $51.18 and $55.01. Confirm with the hall.', src:'LU 1393 agreement 2024–2027'}),
-  G({id:'71', lu:'LU 71, 245', name:'Ohio statewide', region:'Midwest', jl:50.15, conf:'contract', src:'LU 71 agreement (2027)'}),
+  G(Object.assign({}, LU71_BASE, {id:'71', lu:'LU 71, 245', name:'Ohio statewide', src:LU71_SRC,
+    classes:LU71_CLASSES(), benefits:LU71_BEN(), allowances:LU71_ALLOW(), storm:LU71_STORM(),
+    classNote:"Titles and rates from Section 5.01(a). Percentage classes come off the journeyman rate; flat-rate classes got the 4.25% raise on their posted wage, the same way the 2025 column was built.",
+    reg:{stHrs:8, ot:1.5, dtAfter:16, dt:2, sat:1.5, satDtAfter:8, sun:2, conf:'contract', note:"Section 4.01: 8 hours between 7:00 AM and 6:00 PM, Monday to Friday. 1.5× for the first 8 hours after the workday, then 2× after 16. Saturday 1.5× for 8 hours, then 2×. Sundays and holidays 2×. Swing and graveyard shift premiums (4.03) aren't figured in."}})),
+  G(Object.assign({}, LU71_BASE, {id:'71t', lu:'LU 71, 245', name:'Ohio statewide, 4-10 schedule', src:LU71_SRC,
+    classes:LU71_CLASSES(), benefits:LU71_BEN(), allowances:LU71_ALLOW(), storm:LU71_STORM(),
+    classNote:"Same titles and rates as the 8-hour schedule (Section 5.01(a)).",
+    reg:{stHrs:10, ot:1.5, dtAfter:16, dt:2, fri:1.5, sat:1.5, satDtAfter:8, sun:2, conf:'contract', note:"Section 4.02 four-10s: 10 hours Monday to Thursday. 1.5× for the first 6 hours after, then 2×. Friday 1.5× for the first 16 hours, then 2×. Saturday 1.5× for 8 hours, then 2×. Sundays and holidays 2×. A make-up Friday pays straight time, so use the 8-hour schedule for those."}})),
+  G({id:'71p', lu:'LU 71, 245', name:'Ohio, pipe-type cable', region:'Midwest', conf:'contract', duesPct:0, allowances:LU71_ALLOW(),
+    src:'LU 71 agreement, Article VI high tension pipe-type cable rates. 2026 rate is the 1/6/25 posted wage plus the 4.25% raise effective 1/5/26',
+    rates:[{eff:'2024-01-01',jl:50.66},{eff:'2025-01-06',jl:52.94},{eff:'2026-01-05',jl:55.19}],
+    classes:[
+      {id:'gf',name:'Foreman',pct:110},
+      {id:'jl',name:'Journeyman lineman',pct:100},
+      {id:'weld',name:'Certified lineman welder',pct:100},
+      {id:'spl',name:'Certified cable splicer',pct:100},
+      {id:'xray',name:'X-ray technician',pct:100}
+    ].concat(apprentices(true), [
+      {id:'emc',name:'Equipment mechanic "C"',rates:[{eff:'2024-01-01',rate:32.29},{eff:'2025-01-06',rate:33.74},{eff:'2026-01-05',rate:35.17}]},
+      {id:'emb',name:'Equipment mechanic "B"',rates:[{eff:'2024-01-01',rate:36.23},{eff:'2025-01-06',rate:37.86},{eff:'2026-01-05',rate:39.47}]},
+      {id:'ema',name:'Equipment mechanic "A"',rates:[{eff:'2024-01-01',rate:40.18},{eff:'2025-01-06',rate:41.99},{eff:'2026-01-05',rate:43.77}]},
+      {id:'opc',name:'Operator "C"',rates:[{eff:'2024-01-01',rate:32.29},{eff:'2025-01-06',rate:33.74},{eff:'2026-01-05',rate:35.17}]},
+      {id:'opb',name:'Operator "B"',rates:[{eff:'2024-01-01',rate:40.18},{eff:'2025-01-06',rate:41.99},{eff:'2026-01-05',rate:43.77}]},
+      {id:'opa',name:'Operator "A"',rates:[{eff:'2024-01-01',rate:45.39},{eff:'2025-01-06',rate:47.43},{eff:'2026-01-05',rate:49.45}]},
+      {id:'crane45',name:'Crane operator, 45 ton and up',sub:'Paid the journeyman lineman rate',pct:100},
+      {id:'gm1',name:'Groundman / truck driver, first year',pct:50},
+      {id:'gm1c',name:'Groundman / truck driver, first year, with CDL',pct:55},
+      {id:'gm2',name:'Groundman / truck driver, 1 year or over',pct:55},
+      {id:'gm2c',name:'Groundman / truck driver, 1 year or over, with CDL',pct:65}
+    ]),
+    classNote:"Titles and rates from the pipe-type cable table in Article VI.",
+    benefits:[{name:'Health & welfare (LINECO)',per:'hr',amt:7.50},{name:'Health reimbursement (HRA)',per:'hr',amt:0.75},{name:'NEBF',per:'pct',amt:3},{name:'Annuity (NEAP)',per:'pct',amt:24}],
+    benConf:'contract',
+    storm:LU71_STORM(),
+    reg:{stHrs:8, ot:1.5, dtAfter:16, dt:2, sat:1.5, satDtAfter:8, sun:2, conf:'contract', note:"Section 6.04: 8 hours between 8:00 AM and 4:30 PM. The first 8 hours after quitting time are 1.5×, then 2× until the next start. Saturday 1.5× for 8 hours, then 2×. Sunday 2×. Splicing shift differentials and 12-hour splicing shifts aren't figured in."},
+    meal:{amt:19, every:6}}),
   G({id:'17', lu:'LU 17', name:'Detroit, SE Michigan', region:'Midwest', jl:58.67, conf:'contract', src:'LU 17 agreement (2027)', gf:1.117, fm:1.055}),
   G({id:'876', lu:'LU 876', name:'Michigan statewide', region:'Midwest', jl:54.87, conf:'estimate', src:'Estimated from the LU 876 agreement', gf:1.145, fm:1.111, classNote:'Under this agreement the general foreman is 3% over foreman.'}),
   G({id:'953', lu:'LU 953, 2150', name:'Wisconsin statewide', region:'Midwest', jl:39.36, conf:'estimate', src:'Estimated 2026 rate', gf:1.10, fm:1.10, neap:.12}),
@@ -728,14 +793,18 @@ function getLoc(job){
   if(num(c.pen) > 0) funds.push({name:'Pension', per:'pct', amt:num(c.pen)});
   if(num(c.ann) > 0) funds.push({name:'Annuity', per:c.annPer === 'hr' ? 'hr' : 'pct', amt:num(c.ann)});
   return {id:'custom', lu:c.name || 'My local', name:'your rates', region:'', rates:[{eff:null, jl:num(c.jl)}], conf:'user', src:'Entered by you', rateNote:'',
-    classes:genClasses((num(c.gf) || 110)/100, (num(c.fm) || 105)/100), classNote:'', benefits:funds, benConf:'user', benBasis:'gross', deductions:null, duesPct:3, storm:S_UNK(), reg:R_STD(), meal:null};
+    classes:genClasses((num(c.gf) || 110)/100, (num(c.fm) || 105)/100), classNote:'', benefits:funds, benConf:'user', benBasis:'gross', deductions:null, duesPct:3, storm:S_UNK(), reg:R_STD(), meal:null, allowances:[]};
 }
 function getClass(job, loc){
   if(job.classId === 'custom') return {id:'custom', name:'My rate', fixed:num(job.customRate)};
   return loc.classes.find(c => c.id === job.classId) || loc.classes.find(c => c.id === 'jl') || loc.classes[0];
 }
 function jlAt(loc, t){ let r = loc.rates[0]; for(const x of loc.rates){ if(dateMs(x.eff) <= t) r = x; } return r.jl; }
-function scaleRate(loc, cls, t){ return cls.fixed != null ? cls.fixed : round2(jlAt(loc, t) * cls.pct / 100); }
+function scaleRate(loc, cls, t){
+  if(cls.fixed != null) return cls.fixed;
+  if(cls.rates){ let r = cls.rates[0]; for(const x of cls.rates){ if(dateMs(x.eff) <= t) r = x; } return r.rate; }
+  return round2(jlAt(loc, t) * cls.pct / 100);
+}
 function payRate(ctx, t){
   const c = scaleRate(ctx.loc, ctx.cls, t), o = ctx.job.over || {}, v = num(o.val);
   if(o.kind === 'plus') return round2(c + v);
@@ -759,13 +828,14 @@ function multAt(ctx, shift, t, mode){
   }
   const r = job.reg;
   if(dow === 0 || hol) return num(r.sun) || 2;
-  if(dow === 6) return num(r.sat) || 1.5;
+  if(dow === 6) return (num(r.satDtAfter) && h >= num(r.satDtAfter)) ? (num(r.dt) || 2) : (num(r.sat) || 1.5);
+  if(dow === 5 && num(r.fri)) return (num(r.dtAfter) && h >= num(r.dtAfter)) ? (num(r.dt) || 2) : num(r.fri);
   if(h < (num(r.stHrs) || 8)) return 1;
   if(num(r.dtAfter) && h >= num(r.dtAfter)) return num(r.dt) || 2;
   return num(r.ot) || 1.5;
 }
 function thresholds(job){
-  const a = job.type === 'storm' ? [job.storm.dtAfter, job.storm.wkndDtAfter] : [job.reg.stHrs, job.reg.dtAfter];
+  const a = job.type === 'storm' ? [job.storm.dtAfter, job.storm.wkndDtAfter] : [job.reg.stHrs, job.reg.dtAfter, job.reg.satDtAfter];
   return a.map(num).filter(x => x > 0);
 }
 function breakpoints(ctx, shift, a, b){
@@ -783,7 +853,7 @@ function fundRate(ctx, f, R, m){
 }
 function calcShift(ctx, shift, upTo){
   const end = shift.end != null ? Math.min(shift.end, upTo) : upTo;
-  const res = {ms:0, wages:0, ben:0, funds:ctx.funds.map(() => 0), byMult:{}, meals:0};
+  const res = {ms:0, wages:0, ben:0, funds:ctx.funds.map(() => 0), byMult:{}, meals:0, allow:0};
   if(end <= shift.start) return res;
   const pts = breakpoints(ctx, shift, shift.start, end);
   for(let i = 0; i < pts.length - 1; i++){
@@ -794,6 +864,7 @@ function calcShift(ctx, shift, upTo){
     ctx.funds.forEach((f, j) => { res.funds[j] += fundRate(ctx, f, R, m) * h; });
   }
   res.ben = res.funds.reduce((s, x) => s + x, 0);
+  res.allow = (res.ms / H) * (ctx.loc.allowances || []).reduce((s, a) => s + num(a.perHr), 0);
   const ml = ctx.job.meal;
   if(ml && ml.on && num(ml.every) > 0) res.meals = Math.floor(res.ms / H / num(ml.every)) * num(ml.amt);
   return res;
@@ -910,9 +981,15 @@ const running = () => { const j = activeJob(); return j ? runningIn(j) : null; }
 function runningAny(){ for(const j of state.jobs){ const r = runningIn(j); if(r) return {job:j, shift:r}; } return null; }
 function jobName(job){ const loc = getLoc(job); return job.name || (loc.lu + (job.type === 'storm' ? ' storm' : ' job')); }
 
-function blank(){ return {ms:0, wages:0, ben:0, funds:null, meals:0, perDiem:0, days:new Set()}; }
+function blank(){ return {ms:0, wages:0, ben:0, funds:null, meals:0, allow:0, perDiem:0, days:new Set()}; }
+function extrasTxt(a, names){
+  const parts = [];
+  if(a.allow > 0) parts.push(names.allow); if(a.meals > 0) parts.push('meals'); if(a.perDiem > 0) parts.push('per diem');
+  const tot = a.allow + a.meals + a.perDiem;
+  return tot > 0 ? ', + ' + money(tot) + ' ' + parts.join(' and ') : '';
+}
 function addTo(acc, r, day){
-  acc.ms += r.ms; acc.wages += r.wages; acc.ben += r.ben; acc.meals += r.meals; acc.days.add(day);
+  acc.ms += r.ms; acc.wages += r.wages; acc.ben += r.ben; acc.meals += r.meals; acc.allow += r.allow || 0; acc.days.add(day);
   if(!acc.funds) acc.funds = r.funds.map(() => 0);
   r.funds.forEach((v, i) => { acc.funds[i] += v; });
 }
@@ -1258,9 +1335,9 @@ function renderClasses(){
     ? 'Built from your journeyman rate and the percentages you entered.'
     : 'Foreman percentages are from this agreement. Apprentice steps show the common 60–90% ladder. Operators, groundmen and other titles vary by local, so use My own rate for those.');
   let h = loc.classes.map(c => {
-    const rate = round2(jlAt(loc, now) * c.pct / 100);
+    const rate = scaleRate(loc, c, now);
     return '<label class="cls"><input type="radio" name="fClass" value="' + esc(c.id) + '"' + (c.id === d.classId ? ' checked' : '') + '>' +
-      '<span class="cls-n">' + esc(c.name) + '<small>' + (c.sub ? esc(c.sub) + '. ' : '') + pctTxt(c.pct) + ' of journeyman' + (c.typical ? ', typical' : '') + '</small></span>' +
+      '<span class="cls-n">' + esc(c.name) + '<small>' + (c.sub ? esc(c.sub) + '. ' : '') + (c.rates ? 'Posted rate' : pctTxt(c.pct) + ' of journeyman') + (c.typical ? ', typical' : '') + '</small></span>' +
       '<span class="cls-r">' + money(rate) + '</span></label>';
   }).join('');
   h += '<label class="cls"><input type="radio" name="fClass" value="custom"' + (d.classId === 'custom' ? ' checked' : '') + '><span class="cls-n">My own rate<small>Any title not listed</small></span><span class="cls-r"></span></label>';
@@ -1438,10 +1515,11 @@ function tick(force){
   if(fundCells.total && fundCells.total[0]){ fundCells.total[0].textContent = money(b); fundCells.total[1].textContent = money(J.ben); }
   dedCells.forEach(c => { if(c[0]) c[0].textContent = '− ' + money(w * c[2] / 100); if(c[1]) c[1].textContent = '− ' + money(J.wages * c[2] / 100); });
 
-  E.tTodayS.textContent = (T.ms / H).toFixed(2) + ' hours' + (T.perDiem + T.meals > 0 ? ', + ' + money(T.perDiem + T.meals) + ' per diem and meals' : '');
+  const xn = {allow:'FR allowance'};
+  E.tTodayS.textContent = (T.ms / H).toFixed(2) + ' hours' + extrasTxt(T, xn);
   E.tTodayW.textContent = money(T.wages); E.tTodayB.textContent = '+ ' + money(T.ben) + ' benefits';
   E.tJobL.textContent = 'This job: ' + jobName(job);
-  E.tJobS.textContent = (J.ms / H).toFixed(2) + ' hours over ' + J.days.size + ' day' + (J.days.size === 1 ? '' : 's') + (J.perDiem + J.meals > 0 ? ', + ' + money(J.perDiem + J.meals) + ' per diem and meals' : '');
+  E.tJobS.textContent = (J.ms / H).toFixed(2) + ' hours over ' + J.days.size + ' day' + (J.days.size === 1 ? '' : 's') + extrasTxt(J, xn);
   E.tJobW.textContent = money(J.wages); E.tJobB.textContent = '+ ' + money(J.ben) + ' benefits';
 
   const plan = num(job.plannedHrs);
@@ -1544,6 +1622,7 @@ function detailHtml(job, shift){
     h += '<tr class="gap"><th scope="row" colspan="2">Off your check</th></tr>';
     deds.forEach(d => { h += '<tr><th scope="row">' + esc(d.name) + '<small>' + pctTxt(d.pct) + ' of gross' + (d.sub ? '. ' + esc(d.sub) : '') + '</small></th><td>− ' + money(r.wages * d.pct / 100) + '</td></tr>'; });
   }
+  (ctx.loc.allowances || []).forEach(a => { if(r.ms) h += '<tr><th scope="row">' + esc(a.name) + '<small>' + money(a.perHr) + ' an hour worked, paid weekly</small></th><td>' + money(r.ms / H * a.perHr) + '</td></tr>'; });
   if(r.meals) h += '<tr><th scope="row">Meal money</th><td>' + money(r.meals) + '</td></tr>';
   h += '</tbody></table>';
   const notes = [];
@@ -1867,11 +1946,11 @@ function sheetText(){
     const r = S.per.get(s.id);
     lines.push(dateTxt(s.start) + '  ' + timeTxt(s.start) + ' to ' + (s.end == null ? 'on the clock' : timeTxt(s.end)) + '  ' + hrsTxt(r.ms) + (r.ms ? ' (' + byMultTxt(r) + ')' : '') + (s.holiday ? ', holiday' : ''));
     if(job.type === 'storm' && (s.modes || []).length > 1) lines.push('    ' + segTxt(s));
-    lines.push('    wages ' + money(r.wages) + ', benefits ' + money(r.ben) + (r.meals ? ', meals ' + money(r.meals) : ''));
+    lines.push('    wages ' + money(r.wages) + ', benefits ' + money(r.ben) + (r.allow ? ', FR allowance ' + money(r.allow) : '') + (r.meals ? ', meals ' + money(r.meals) : ''));
     if(ctx.funds.length) lines.push('    ' + ctx.funds.map((f, i) => f.name + ' ' + money(r.funds[i])).join(', '));
     if(s.note) lines.push('    Note: ' + s.note.replace(/\s+/g, ' '));
   });
-  lines.push('', 'Total ' + (S.job.ms / H).toFixed(2) + ' h. Wages ' + money(S.job.wages) + '. Benefits ' + money(S.job.ben) + '.' + (S.job.perDiem + S.job.meals > 0 ? ' Per diem and meals ' + money(S.job.perDiem + S.job.meals) + '.' : ''));
+  lines.push('', 'Total ' + (S.job.ms / H).toFixed(2) + ' h. Wages ' + money(S.job.wages) + '. Benefits ' + money(S.job.ben) + '.' + (S.job.allow > 0 ? ' FR allowance ' + money(S.job.allow) + '.' : '') + (S.job.perDiem + S.job.meals > 0 ? ' Per diem and meals ' + money(S.job.perDiem + S.job.meals) + '.' : ''));
   if(ctx.funds.length && S.job.funds) lines.push(ctx.funds.map((f, i) => f.name + ' ' + money(S.job.funds[i])).join('. ') + '.');
   lines.push('Estimate from Time Hand. Check against your agreement and pay stub.');
   return lines.join('\n');
