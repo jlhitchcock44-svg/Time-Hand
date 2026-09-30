@@ -1083,10 +1083,11 @@ const SALE = {
   productIds: [1392230],      /* Time Hand (test mode). Add the live-mode copy's ID after approval */
   allowTestKeys: true,        /* test-mode keys unlock the app. Set false when the store goes live */
   price: '$19.99',
-  trialDays: 7,
+  trialDays: 3,
   recheckDays: 3,             /* re-validate the key this often when there's signal */
   graceDays: 21               /* storm zones lose signal: keep working this long past renewal without a check */
 };
+const SUPPORT_EMAIL = 'jlhitchcock44@gmail.com';
 const DAY = 24 * H, LIC_KEY = 'timehand.license', TRIAL_KEY = 'timehand.trial', LS_API = 'https://api.lemonsqueezy.com/v1/licenses/';
 const saleOn = () => !!(SALE.checkoutUrl && SALE.storeId && SALE.productIds.length);
 function readLic(){ try { return JSON.parse(localStorage.getItem(LIC_KEY) || 'null'); } catch(e){ return null; } }
@@ -1125,7 +1126,7 @@ async function activateKey(key){
   catch(e){ return "Can't reach the license server. Get a signal and try again."; }
   if(!j.activated){
     const e = String(j.error || '').toLowerCase();
-    if(e.includes('limit')) return 'This key is already on 2 phones. On the old phone, go to Job and tap Move to another phone, then try again.';
+    if(e.includes('limit')) return "This key is already on 2 phones. On the old phone, go to Job and tap Move to another phone, then try again. Cleared your browser's website data? That counts as a new phone. Email " + SUPPORT_EMAIL + " and we'll reset your key.";
     if(e.includes('not found')) return "That key wasn't found. Copy it again from your receipt email.";
     if(e.includes('expired')) return 'This key has expired. Renew your year to unlock.';
     if(e.includes('disabled')) return 'This key has been turned off.';
@@ -1167,10 +1168,10 @@ function showLock(a, voluntary){
   lockMode = a.mode; lockVoluntary = !!voluntary;
   const lapsedExpired = a.lic && a.lic.status === 'expired';
   const T = {
-    trialOver:["Your free week is up", "Your shifts are saved. Get a year of Time Hand to keep the clock running."],
+    trialOver:["Your free trial is up", "Your shifts are saved. Get a year of Time Hand to keep the clock running."],
     lapsed:[lapsedExpired ? 'Your year is up' : "This key isn't active", 'Your shifts are saved. Renew to keep the clock running.'],
     recheck:['Time to check your key', "Time Hand checks your key every so often and hasn't been able to reach the license server. Get a signal and tap Check now."],
-    trial:['Unlock Time Hand', 'You have ' + (a.left ? daysLeftTxt(a.left) : 'some time') + ' left in your free week.']
+    trial:['Unlock Time Hand', 'You have ' + (a.left ? daysLeftTxt(a.left) : 'some time') + ' left in your free trial.']
   }[a.mode] || ['Unlock Time Hand', ''];
   E.lockTitle.textContent = T[0]; E.lockLede.textContent = T[1];
   E.buyBtn.href = SALE.checkoutUrl;
@@ -1193,10 +1194,10 @@ function applyAccess(){
 function renderSale(){
   const a = access(Date.now());
   E.saleBar.hidden = a.mode !== 'trial';
-  if(a.mode === 'trial') E.saleBar.innerHTML = '<span>Free week: ' + daysLeftTxt(a.left) + ' left.</span><a href="' + esc(SALE.checkoutUrl) + '" target="_blank" rel="noopener">Get a year for ' + esc(SALE.price) + '</a><button type="button" data-lic="enter">Enter key</button>';
+  if(a.mode === 'trial') E.saleBar.innerHTML = '<span>Free trial: ' + daysLeftTxt(a.left) + ' left.</span><a href="' + esc(SALE.checkoutUrl) + '" target="_blank" rel="noopener">Get a year for ' + esc(SALE.price) + '</a><button type="button" data-lic="enter">Enter key</button>';
   E.licRow.hidden = a.mode === 'free';
   if(a.mode === 'paid') E.licRow.innerHTML = '<p>Time Hand is paid up' + (isFinite(a.exp) ? ' through ' + new Date(a.exp).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '') + '. It renews on its own.</p><button type="button" class="linkbtn" data-lic="move">Move to another phone</button>';
-  else if(a.mode === 'trial') E.licRow.innerHTML = '<p>Free week: ' + daysLeftTxt(a.left) + ' left.</p><button type="button" class="linkbtn" data-lic="enter">Enter key</button>';
+  else if(a.mode === 'trial') E.licRow.innerHTML = '<p>Free trial: ' + daysLeftTxt(a.left) + ' left.</p><button type="button" class="linkbtn" data-lic="enter">Enter key</button>';
 }
 function licAction(ev){
   const b = ev.target.closest('[data-lic]'); if(!b) return;
@@ -1752,7 +1753,10 @@ E.shiftForm.addEventListener('submit', ev => {
 
 /* backup + restore */
 function ymd(ms){ const d = new Date(ms); return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()); }
-function backupText(){ return JSON.stringify({app:'timehand', kind:'backup', v:2, exportedAt:Date.now(), jobs:state.jobs, activeId:state.activeId, history:state.history || []}); }
+function backupText(){
+  let trial = null; try { trial = Number(localStorage.getItem(TRIAL_KEY)) || null; } catch(e){}
+  return JSON.stringify({app:'timehand', kind:'backup', v:2, exportedAt:Date.now(), trial, jobs:state.jobs, activeId:state.activeId, history:state.history || []});
+}
 function openBackup(){
   const shifts = state.jobs.reduce((n, j) => n + j.shifts.length, 0);
   E.bkSum.textContent = state.jobs.length + ' job' + (state.jobs.length === 1 ? '' : 's') + ', ' + shifts + ' shift' + (shifts === 1 ? '' : 's') + '.';
@@ -1794,6 +1798,9 @@ function mergeBackup(o){
   (o.history || []).forEach(h => { const k = JSON.stringify(h); if(!seen.has(k)){ state.history.push(h); seen.add(k); } });
   if(!activeJob()) state.activeId = (o.activeId && state.jobs.some(j => j.id === o.activeId)) ? o.activeId : (state.jobs[0] ? state.jobs[0].id : null);
   persist();
+  /* a restore can't hand out a fresh free trial: keep whichever start date is earlier */
+  const bt = Number(o.trial) || (o.jobs.length ? Math.min.apply(null, [o.exportedAt || Date.now()].concat(o.jobs.map(j => j.created || Date.now()))) : null);
+  if(bt){ try { const cur = Number(localStorage.getItem(TRIAL_KEY)) || Infinity; if(bt < cur) localStorage.setItem(TRIAL_KEY, String(bt)); } catch(e){} }
   return {jobs, shifts};
 }
 function openRestore(){ E.rsErr.textContent = ''; E.rsText.value = ''; E.rsFile.value = ''; E.rsDlg.showModal(); }
@@ -1813,6 +1820,7 @@ E.rsGo.addEventListener('click', async () => {
   if(!o){ E.rsErr.textContent = "That isn't a Time Hand backup."; return; }
   const r = mergeBackup(o);
   E.rsDlg.close();
+  if(saleOn() && !applyAccess()){ toast('Restored. Enter your key to keep using Time Hand.'); return; }
   if(activeJob()) goClock(); else openSetup('new');
   toast(r.jobs || r.shifts ? 'Restored ' + r.jobs + ' job' + (r.jobs === 1 ? '' : 's') + ' and ' + r.shifts + ' shift' + (r.shifts === 1 ? '' : 's') + '.' : 'Everything in that backup is already on this phone.');
 });
