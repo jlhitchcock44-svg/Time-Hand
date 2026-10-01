@@ -1078,11 +1078,11 @@ function switchJob(id){ state.activeId = id; persist(); goClock(); }
    Fill in checkoutUrl, storeId and productId to turn the paywall on.
    While any of them is empty the app stays free and never calls out. */
 const SALE = {
-  checkoutUrl: 'https://staycutin.lemonsqueezy.com/checkout/buy/f70dbbb8-af4c-4e4c-bedc-a0c28b295914',
+  checkoutUrl: 'https://staycutin.lemonsqueezy.com/checkout/buy/a26d25e6-9d12-41f5-bda1-033b455d9d54',
   storeId: 484633,            /* Stay Cut In Electric */
-  productIds: [1392230],      /* Time Hand (test mode). Add the live-mode copy's ID after approval */
-  allowTestKeys: true,        /* test-mode keys unlock the app. Set false when the store goes live */
-  price: '$19.99',
+  productIds: [1404105, 1392230], /* Time Hand live (1404105) and test-mode copy */
+  allowTestKeys: false,       /* store is live: test-mode keys no longer unlock the app */
+  price: '$9.99',
   trialDays: 3,
   recheckDays: 3,             /* re-validate the key this often when there's signal */
   graceDays: 21               /* storm zones lose signal: keep working this long past renewal without a check */
